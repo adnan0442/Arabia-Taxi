@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>Arabia Taxi Tracker</title>
+  <style>
+    :root {
+      --gold: #FFF0B3;
+      --dark: #191919;
+      --page: #F3F4F6;
+      --card: #FFFFFF;
+      --ink: #111827;
+      --muted: #6B7280;
+      --green: #D9F0C4;
+      --blue: #DAE3F3;
+      --blue-ink: #0070C0;
+      --blue-card: #EEF5FC;
+      --day-chip: #CFE0F7;
+      --orange: #F9C9A6;
+      --orange-card: #FDEBDD;
+      --today: #FFF6CC;
+      --lime: #E3F5D2;
+      --red: #D92121;
+      --red-card: #FDE1DF;
+      --font: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+      color-scheme: light;
+    }
+
+    [data-theme="dark"] {
+      --gold: #374151;
+      --dark: #F3F4F6;
+      --page: #0B0F19;
+      --card: #111827;
+      --ink: #F9FAFB;
+      --muted: #9CA3AF;
+      --green: #064E3B;
+      --blue: #1E3A8A;
+      --blue-ink: #60A5FA;
+      --blue-card: #1F2937;
+      --day-chip: #1E3A8A;
+      --orange: #7C2D12;
+      --orange-card: #431407;
+      --today: #78350F;
+      --lime: #065F46;
+      --red: #EF4444;
+      --red-card: #7F1D1D;
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font: 16px/1.4 var(--font);
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .wrap {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .brand {
+      background: var(--gold);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: background 0.2s ease;
+    }
+
+    .brand-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .brand h1 {
+      font: 700 24px/1.15 var(--font);
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .action-btn {
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 0;
+      border-radius: 10px;
+      font: 700 12px/1 var(--font);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      transition: transform 0.1s ease, opacity 0.15s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .action-btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-pdf {
+      background: var(--dark);
+      color: var(--page);
+    }
+
+    .btn-about {
+      background: var(--card);
+      color: var(--ink);
+    }
+
+    .btn-dark {
+      background: #374151;
+      color: #FFFFFF;
+    }
+    [data-theme="dark"] .btn-dark {
+      background: #F3F4F6;
+      color: #111827;
+    }
+
+    .sub {
+      font: 500 14px var(--font);
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #driverId {
+      font: 700 14px var(--font);
+      color: var(--ink);
+      background: transparent;
+      width: 9ch;
+      border: 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.45);
+      padding: 0 2px;
+    }
+
+    /* Month bar */
+    .month {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--page);
+      padding: 12px 0;
+      margin-top: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .month h2 {
+      font: 700 20px/1.2 var(--font);
+      margin: 0;
+    }
+
+    .nav {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      font: 600 22px/1 var(--font);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+    }
+
+    /* Total card */
+    .hero {
+      background: var(--green);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transition: background 0.2s ease;
+    }
+
+    .label {
+      font: 600 13px var(--font);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .big {
+      font: 700 44px/1.1 var(--font);
+      margin: 6px 0 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .meta {
+      font: 500 14px var(--font);
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-block;
+      margin-top: 14px;
+      background: var(--blue);
+      color: var(--red);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font: 700 22px/1.1 var(--font);
+    }
+
+    /* Stat cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 16px;
+      min-width: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      background: var(--card);
+      transition: background 0.2s ease;
+    }
+
+    .stat .k {
+      font: 500 13px var(--font);
+      color: var(--muted);
+    }
+
+    .stat .v {
+      font: 700 26px/1.15 var(--font);
+      margin-top: 6px;
+      overflow-wrap: anywhere;
+    }
+
+    .s-avg { background: var(--card); }
+    .s-left { background: var(--card); }
+    .s-min { background: var(--card); }
+    .s-max { background: var(--card); }
+    .s-need { background: var(--red-card); grid-column: 1 / -1; }
+    .s-need .v { color: var(--red); }
+
+    /* Daily list */
+    .days-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin: 26px 0 10px;
+    }
+
+    .days-head h3 {
+      font: 700 16px var(--font);
+      margin: 0;
+    }
+
+    .note {
+      font: 500 13px var(--font);
+      color: var(--muted);
+    }
+
+    .days {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .day {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 16px;
+      background: var(--blue-card);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: background 0.2s ease;
+    }
+
+    .day.is-off { background: var(--orange-card); }
+    .day.is-today { background: var(--today); }
+
+    .day .d {
+      background: var(--day-chip);
+      color: var(--blue-ink);
+      font: 700 15px var(--font);
+      padding: 8px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .day .d small {
+      font: 500 12px var(--font);
+      margin-left: 4px;
+    }
+
+    .day.is-today .d::after {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .day input {
+      min-width: 0;
+      width: 100%;
+      min-height: 44px;
+      padding: 12px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--ink);
+      font: 700 20px/1.2 var(--font);
+      text-align: right;
+    }
+
+    .day.is-off input {
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .day.invalid input {
+      box-shadow: inset 0 0 0 2px var(--red);
+    }
+
+    .off-btn {
+      min-height: 44px;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--orange);
+      color: var(--ink);
+      font: 600 14px var(--font);
+      cursor: pointer;
+    }
+
+    .off-btn[aria-pressed="true"] {
+      background: var(--red);
+      color: #FFFFFF;
+    }
+
+    .status {
+      min-height: 1.4em;
+      margin-top: 14px;
+      text-align: center;
+      font: 500 13px var(--font);
+      color: var(--muted);
+    }
+
+    .status.error {
+      color: var(--red);
+    }
+
+    .credit {
+      margin-top: 24px;
+      text-align: center;
+      font: 600 13px var(--font);
+      color: var(--muted);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--blue-ink);
+      outline-offset: 2px;
+    }
+
+    /* About Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(17, 24, 39, 0.55);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop[hidden] {
+      display: none !important;
+    }
+
+    .modal-card {
+      background: var(--card);
+      color: var(--ink);
+      width: 100%;
+      max-width: 380px;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18);
+      animation: popIn 0.18s ease-out;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font: 700 20px/1.2 var(--font);
+    }
+
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 0;
+      background: var(--page);
+      color: var(--ink);
+      font: 700 18px/1 var(--font);
+      cursor: pointer;
+    }
+
+    .dev-badge {
+      background: var(--gold);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .dev-badge .role {
+      font: 700 11px var(--font);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .dev-badge .name {
+      font: 700 22px/1.2 var(--font);
+      margin-top: 2px;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--page);
+      padding: 12px 14px;
+      border-radius: 12px;
+    }
+
+    .info-row .lbl {
+      font: 600 13px var(--font);
+      color: var(--muted);
+    }
+
+    .info-row .val {
+      font: 700 15px var(--font);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .info-row a.val {
+      color: var(--blue-ink);
+    }
+
+    .modal-footer-btn {
+      margin-top: 18px;
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--dark);
+      color: var(--page);
+      font: 700 15px var(--font);
+      cursor: pointer;
+    }
+
+    /* Print / PDF Stylesheet - Zero-Error Clean Layout */
+    #printReport {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+
+      body {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .wrap,
+      .modal-backdrop {
+        display: none !important;
+      }
+
+      #printReport {
+        display: block !important;
+        width: 100%;
+        font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+        color: #111827;
+      }
+
+      .pr-header {
+        background: #FFF0B3;
+        border: 1px solid #E5D283;
+        border-radius: 10px;
+        padding: 14px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .pr-header h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .pr-header .pr-sub {
+        font-size: 13px;
+        color: #374151;
+        margin-top: 3px;
+      }
+
+      .pr-header .pr-meta {
+        text-align: right;
+        font-size: 13px;
+      }
+
+      .pr-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .pr-box {
+        border: 1px solid #D1D5DB;
+        border-radius: 8px;
+        padding: 8px 10px;
+        background: #F9FAFB;
+      }
+
+      .pr-box.highlight {
+        background: #D9F0C4;
+        border-color: #B6DF8E;
+      }
+
+      .pr-box .k {
+        font-size: 11px;
+        color: #4B5563;
+        text-transform: uppercase;
+      }
+
+      .pr-box .v {
+        font-size: 17px;
+        font-weight: 700;
+        margin-top: 2px;
+      }
+
+      .pr-tables {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .pr-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .pr-table th {
+        background: #191919;
+        color: #FFFFFF;
+        text-align: left;
+        padding: 6px 8px;
+        font-weight: 700;
+      }
+
+      .pr-table th.num,
+      .pr-table td.num {
+        text-align: right;
+      }
+
+      .pr-table td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #E5E7EB;
+      }
+
+      .pr-table tr:nth-child(even) td {
+        background: #F9FAFB;
+      }
+
+      .pr-table tr.pr-off td {
+        background: #FDEBDD;
+        color: #9A3412;
+        font-weight: 600;
+      }
+
+      .pr-footer {
+        margin-top: 14px;
+        padding-top: 8px;
+        border-top: 1px solid #D1D5DB;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #6B7280;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="brand">
+    <div class="brand-top">
+      <h1>Arabia Taxi LLC</h1>
+      <div class="header-actions">
+        <button type="button" class="action-btn btn-pdf" id="exportPdfBtn" aria-label="Export PDF Report">📄 PDF</button>
+        <button type="button" class="action-btn btn-about" id="aboutBtn" aria-label="About Developer">ℹ️ About</button>
+        <button type="button" class="action-btn btn-dark" id="darkModeBtn" aria-label="Toggle Dark Mode">🌙 Dark</button>
+      </div>
+    </div>
+    <div class="sub">
+      <span>Monthly income tracker · Driver ID</span>
+      <input id="driverId" inputmode="numeric" maxlength="20" aria-label="Driver ID" value="3008703">
+    </div>
+  </header>
+
+  <nav class="month" aria-label="Month">
+    <button class="nav" id="prev" type="button" aria-label="Previous month">‹</button>
+    <h2 id="monthLabel">November 2026</h2>
+    <button class="nav" id="next" type="button" aria-label="Next month">›</button>
+  </nav>
+
+  <section class="hero" aria-labelledby="totalLabel">
+    <div class="label" id="totalLabel">Total income</div>
+    <div class="big" id="total">0</div>
+    <div class="meta" id="totalSub">—</div>
+    <span class="pill" id="tierPill">Target —</span>
+  </section>
+
+  <section class="grid" aria-label="Month statistics">
+    <div class="stat s-avg"><div class="k">Average per worked day</div><div class="v" id="avg">—</div></div>
+    <div class="stat s-left" id="boxLeft"><div class="k">Target left</div><div class="v" id="leftTarget">—</div></div>
+    <div class="stat s-min"><div class="k">Lowest day</div><div class="v" id="min">—</div></div>
+    <div class="stat s-max"><div class="k">Highest day</div><div class="v" id="max">—</div></div>
+    <div class="stat s-need" id="boxPerDay"><div class="k">Needed per remaining day</div><div class="v" id="perDay">—</div></div>
+  </section>
+
+  <div class="days-head">
+    <h3>Daily income</h3>
+    <div class="note" id="targetLine">Target 350 per working day</div>
+  </div>
+  <div class="days" id="days">
+<div class="day" data-day="1"><span class="d">Day 1<small>Sun</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 1 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="2"><span class="d">Day 2<small>Mon</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 2 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="3"><span class="d">Day 3<small>Tue</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 3 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="4"><span class="d">Day 4<small>Wed</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 4 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="5"><span class="d">Day 5<small>Thu</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 5 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="6"><span class="d">Day 6<small>Fri</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 6 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="7"><span class="d">Day 7<small>Sat</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 7 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="8"><span class="d">Day 8<small>Sun</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 8 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="9"><span class="d">Day 9<small>Mon</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 9 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="10"><span class="d">Day 10<small>Tue</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 10 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="11"><span class="d">Day 11<small>Wed</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 11 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day is-today" data-day="12"><span class="d">Day 12<small>Thu</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 12 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="13"><span class="d">Day 13<small>Fri</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 13 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="14"><span class="d">Day 14<small>Sat</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 14 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="15"><span class="d">Day 15<small>Sun</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 15 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="16"><span class="d">Day 16<small>Mon</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 16 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="17"><span class="d">Day 17<small>Tue</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 17 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="18"><span class="d">Day 18<small>Wed</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 18 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="19"><span class="d">Day 19<small>Thu</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 19 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="20"><span class="d">Day 20<small>Fri</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 20 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="21"><span class="d">Day 21<small>Sat</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 21 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="22"><span class="d">Day 22<small>Sun</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 22 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="23"><span class="d">Day 23<small>Mon</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 23 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="24"><span class="d">Day 24<small>Tue</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 24 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="25"><span class="d">Day 25<small>Wed</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 25 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="26"><span class="d">Day 26<small>Thu</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 26 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="27"><span class="d">Day 27<small>Fri</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 27 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="28"><span class="d">Day 28<small>Sat</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 28 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="29"><span class="d">Day 29<small>Sun</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 29 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+<div class="day" data-day="30"><span class="d">Day 30<small>Mon</small></span><input inputmode="decimal" autocomplete="off" aria-label="Day 30 income" value="" placeholder="0"><button type="button" class="off-btn" aria-pressed="false">Off</button></div>
+</div>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+  <footer class="credit">Developed by Umair · ID: 3008703</footer>
+</div>
+
+<!-- About Developer Modal -->
+<div class="modal-backdrop" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="aboutTitle">About App</h3>
+      <button type="button" class="close-btn" id="closeAboutBtn" aria-label="Close">✕</button>
+    </div>
+    <div class="dev-badge">
+      <div class="role">App Developer</div>
+      <div class="name">Umair</div>
+    </div>
+    <div class="info-list">
+      <div class="info-row">
+        <span class="lbl">Developer ID</span>
+        <span class="val">3008703</span>
+      </div>
+      <div class="info-row">
+        <span class="lbl">Phone Number</span>
+        <a class="val" href="tel:+971563863688">+971563863688</a>
+      </div>
+      <div class="info-row">
+        <span class="lbl">Application</span>
+        <span class="val">Arabia Taxi Tracker</span>
+      </div>
+    </div>
+    <button type="button" class="modal-footer-btn" id="doneAboutBtn">Close</button>
+  </div>
+</div>
+
+<!-- Clean A4 Print / PDF Report Container -->
+<div id="printReport" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TARGET = 350;
+  var TIERS = [[350, 35], [300, 30], [275, 25], [250, 20], [225, 15], [200, 10]];
+  var LOWEST_PCT = 5;
+  var DEFAULT_DRIVER_ID = "3008703";
+
+  var today = new Date();
+  var view = { y: today.getFullYear(), m: today.getMonth() };
+  var data = {};
+
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (n) { return n.toLocaleString("en-US", { maximumFractionDigits: 2 }); };
+  var pad = function (n) { return String(n).padStart(2, "0"); };
+  var daysIn = function () { return new Date(view.y, view.m + 1, 0).getDate(); };
+  var storageKey = function () { return "arabiaTaxi:" + view.y + "-" + pad(view.m + 1); };
+
+  function setStatus(msg, isError) {
+    var el = $("status");
+    el.textContent = msg;
+    el.className = "status" + (isError ? " error" : "");
+  }
+
+  function loadMonth() {
+    data = {};
+    var raw = null;
+    try { raw = localStorage.getItem(storageKey()); } catch (e) { raw = null; }
+    if (raw !== null) {
+      try { data = JSON.parse(raw) || {}; } catch (e) { data = {}; }
+    }
+  }
+
+  function saveMonth() {
+    try {
+      localStorage.setItem(storageKey(), JSON.stringify(data));
+      setStatus("Saved on this device.");
+    } catch (e) {
+      setStatus("Could not save. Browser storage is blocked, so this data is lost when you leave the page.", true);
+    }
+  }
+
+  function parseInput(text) {
+    var t = String(text).trim();
+    if (t === "") return undefined;
+    if (/^off$/i.test(t)) return "Off";
+    var n = Number(t.replace(/[\s,]/g, ""));
+    return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : null;
+  }
+
+  function setRow(d) {
+    var row = document.querySelector('[data-day="' + d + '"]');
+    if (!row) return;
+    var v = data[d];
+    var isOff = v === "Off";
+    row.classList.toggle("is-off", isOff);
+    row.classList.remove("invalid");
+    row.querySelector("input").value = v === undefined ? "" : String(v);
+    row.querySelector(".off-btn").setAttribute("aria-pressed", String(isOff));
+  }
+
+  function calculateSummary() {
+    var D = daysIn();
+    var total = 0, worked = [], off = 0;
+    for (var d = 1; d <= D; d++) {
+      var v = data[d];
+      if (typeof v === "number") {
+        total += v;
+        worked.push(v);
+      } else if (v === "Off") {
+        off++;
+      }
+    }
+    var notEntered = D - worked.length - off;
+    var avg = worked.length ? total / worked.length : null;
+    var min = worked.length ? Math.min.apply(null, worked) : null;
+    var max = worked.length ? Math.max.apply(null, worked) : null;
+    var leftTarget = (D - off) * TARGET - total;
+    var perDay = notEntered > 0 && leftTarget > 0 ? leftTarget / notEntered : null;
+
+    var tierPct = null;
+    if (avg !== null) {
+      tierPct = LOWEST_PCT;
+      for (var i = 0; i < TIERS.length; i++) {
+        if (avg >= TIERS[i][0]) {
+          tierPct = TIERS[i][1];
+          break;
+        }
+      }
+    }
+
+    return {
+      D: D,
+      total: total,
+      workedCount: worked.length,
+      offCount: off,
+      notEntered: notEntered,
+      avg: avg,
+      min: min,
+      max: max,
+      leftTarget: leftTarget,
+      perDay: perDay,
+      tierPct: tierPct
+    };
+  }
+
+  function renderMonth() {
+    $("monthLabel").textContent = new Date(view.y, view.m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    $("targetLine").textContent = "Target " + TARGET + " per working day";
+
+    var D = daysIn();
+    var html = "";
+    for (var d = 1; d <= D; d++) {
+      var wd = new Date(view.y, view.m, d).toLocaleDateString("en-US", { weekday: "short" });
+      var v = data[d];
+      var isOff = v === "Off";
+      var isToday = today.getFullYear() === view.y && today.getMonth() === view.m && today.getDate() === d;
+      html +=
+        '<div class="day' + (isOff ? " is-off" : "") + (isToday ? " is-today" : "") + '" data-day="' + d + '">' +
+          '<span class="d">Day ' + d + "<small>" + wd + "</small></span>" +
+          '<input inputmode="decimal" autocomplete="off" aria-label="Day ' + d + ' income" value="' +
+            (v === undefined ? "" : v) + '" placeholder="0">' +
+          '<button type="button" class="off-btn" aria-pressed="' + isOff + '">Off</button>' +
+        "</div>";
+    }
+    $("days").innerHTML = html;
+    updateStats();
+  }
+
+  function updateStats() {
+    var s = calculateSummary();
+
+    $("total").textContent = fmt(s.total);
+    $("totalSub").textContent = s.workedCount + " worked · " + s.offCount + " off";
+    $("avg").textContent = s.avg === null ? "—" : fmt(s.avg);
+    $("min").textContent = s.min === null ? "—" : fmt(s.min);
+    $("max").textContent = s.max === null ? "—" : fmt(s.max);
+    $("leftTarget").textContent = s.leftTarget <= 0 ? "Reached" : fmt(s.leftTarget);
+    $("perDay").textContent = s.perDay !== null
+      ? fmt(s.perDay)
+      : (s.notEntered === 0 ? "Month complete" : s.leftTarget <= 0 ? "Target met" : "—");
+
+    $("tierPill").textContent = s.tierPct === null ? "Target —" : "Target " + s.tierPct + "%";
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function exportPdfReport() {
+    try {
+      if (document.activeElement && document.activeElement.tagName === "INPUT") {
+        document.activeElement.blur();
+      }
+
+      var s = calculateSummary();
+      var monthTitle = new Date(view.y, view.m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      var driverId = escapeHtml(($("driverId").value || DEFAULT_DRIVER_ID).trim());
+      var splitDay = Math.ceil(s.D / 2);
+
+      function buildTableRows(startDay, endDay) {
+        var rows = "";
+        for (var d = startDay; d <= endDay; d++) {
+          var wd = new Date(view.y, view.m, d).toLocaleDateString("en-US", { weekday: "short" });
+          var v = data[d];
+          var isOff = v === "Off";
+          var valText = v === undefined ? "—" : (isOff ? "OFF" : fmt(v) + " AED");
+          rows += '<tr class="' + (isOff ? "pr-off" : "") + '">' +
+            '<td>Day ' + d + ' (' + wd + ')</td>' +
+            '<td class="num">' + valText + '</td>' +
+          '</tr>';
+        }
+        return rows;
+      }
+
+      var leftTable =
+        '<table class="pr-table">' +
+          '<thead><tr><th>Date</th><th class="num">Income</th></tr></thead>' +
+          '<tbody>' + buildTableRows(1, splitDay) + '</tbody>' +
+        '</table>';
+
+      var rightTable =
+        '<table class="pr-table">' +
+          '<thead><tr><th>Date</th><th class="num">Income</th></tr></thead>' +
+          '<tbody>' + buildTableRows(splitDay + 1, s.D) + '</tbody>' +
+        '</table>';
+
+      var reportHtml =
+        '<div class="pr-header">' +
+          '<div>' +
+            '<h1>Arabia Taxi LLC</h1>' +
+            '<div class="pr-sub">Monthly Income Statement · ' + escapeHtml(monthTitle) + '</div>' +
+          '</div>' +
+          '<div class="pr-meta">' +
+            '<div><strong>Driver ID:</strong> ' + driverId + '</div>' +
+            '<div><strong>Worked:</strong> ' + s.workedCount + ' days · <strong>Off:</strong> ' + s.offCount + ' days</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pr-summary">' +
+          '<div class="pr-box highlight"><div class="k">Total Income</div><div class="v">' + fmt(s.total) + ' AED</div></div>' +
+          '<div class="pr-box"><div class="k">Daily Average</div><div class="v">' + (s.avg === null ? "—" : fmt(s.avg) + ' AED') + '</div></div>' +
+          '<div class="pr-box"><div class="k">Bonus Tier</div><div class="v">' + (s.tierPct === null ? "—" : s.tierPct + '%') + '</div></div>' +
+          '<div class="pr-box"><div class="k">Target Left</div><div class="v">' + (s.leftTarget <= 0 ? "Reached" : fmt(s.leftTarget) + ' AED') + '</div></div>' +
+        '</div>' +
+        '<div class="pr-tables">' +
+          '<div>' + leftTable + '</div>' +
+          '<div>' + rightTable + '</div>' +
+        '</div>' +
+        '<div class="pr-footer">' +
+          '<span>Generated on ' + new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) + '</span>' +
+          '<span>App Developer: Umair · ID: 3008703 · +971563863688</span>' +
+        '</div>';
+
+      $("printReport").innerHTML = reportHtml;
+
+      setStatus("PDF ready. Printing / Saving...");
+      window.print();
+      setStatus("");
+    } catch (err) {
+      setStatus("PDF export error: Please open in Safari or Chrome browser.", true);
+    }
+  }
+
+  // Dark Mode Toggle Logic
+  var darkModeBtn = $("darkModeBtn");
+  function updateDarkBtnText(isDark) {
+    darkModeBtn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+  }
+
+  function initTheme() {
+    var savedTheme = "light";
+    try {
+      savedTheme = localStorage.getItem("arabiaTaxi:theme") || "light";
+    } catch (e) {
+      savedTheme = "light";
+    }
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      updateDarkBtnText(true);
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      updateDarkBtnText(false);
+    }
+  }
+
+  darkModeBtn.addEventListener("click", function () {
+    var isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (isDark) {
+      document.documentElement.removeAttribute("data-theme");
+      updateDarkBtnText(false);
+      try { localStorage.setItem("arabiaTaxi:theme", "light"); } catch (e) {}
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+      updateDarkBtnText(true);
+      try { localStorage.setItem("arabiaTaxi:theme", "dark"); } catch (e) {}
+    }
+  });
+
+  initTheme();
+
+  $("days").addEventListener("change", function (e) {
+    if (e.target.tagName !== "INPUT") return;
+    var row = e.target.closest(".day");
+    var d = Number(row.dataset.day);
+    var parsed = parseInput(e.target.value);
+    if (parsed === null) {
+      row.classList.add("invalid");
+      setStatus("Enter a number, or Off.", true);
+      return;
+    }
+    if (parsed === undefined) delete data[d]; else data[d] = parsed;
+    setRow(d);
+    saveMonth();
+    updateStats();
+  });
+
+  $("days").addEventListener("click", function (e) {
+    if (!e.target.classList.contains("off-btn")) return;
+    var d = Number(e.target.closest(".day").dataset.day);
+    if (data[d] === "Off") delete data[d]; else data[d] = "Off";
+    setRow(d);
+    saveMonth();
+    updateStats();
+  });
+
+  function shiftMonth(delta) {
+    view.m += delta;
+    if (view.m < 0) { view.m = 11; view.y--; }
+    if (view.m > 11) { view.m = 0; view.y++; }
+    loadMonth();
+    renderMonth();
+    setStatus("");
+  }
+
+  $("prev").addEventListener("click", function () { shiftMonth(-1); });
+  $("next").addEventListener("click", function () { shiftMonth(1); });
+
+  var aboutModal = $("aboutModal");
+  function openAbout() {
+    aboutModal.hidden = false;
+    $("closeAboutBtn").focus();
+  }
+  function closeAbout() {
+    aboutModal.hidden = true;
+    $("aboutBtn").focus();
+  }
+
+  $("aboutBtn").addEventListener("click", openAbout);
+  $("closeAboutBtn").addEventListener("click", closeAbout);
+  $("doneAboutBtn").addEventListener("click", closeAbout);
+  aboutModal.addEventListener("click", function (e) {
+    if (e.target === aboutModal) closeAbout();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !aboutModal.hidden) closeAbout();
+  });
+
+  $("exportPdfBtn").addEventListener("click", exportPdfReport);
+
+  var idInput = $("driverId");
+  try {
+    idInput.value = localStorage.getItem("arabiaTaxi:driverId") || DEFAULT_DRIVER_ID;
+  } catch (e) {
+    idInput.value = DEFAULT_DRIVER_ID;
+  }
+  idInput.addEventListener("change", function () {
+    var v = idInput.value.trim() || DEFAULT_DRIVER_ID;
+    idInput.value = v;
+    try {
+      localStorage.setItem("arabiaTaxi:driverId", v);
+      setStatus("Driver ID saved.");
+    } catch (e) {
+      setStatus("Could not save the Driver ID. Browser storage is blocked.", true);
+    }
+  });
+
+  loadMonth();
+  renderMonth();
+})();
+</script>
+
+</body>
+</html>
