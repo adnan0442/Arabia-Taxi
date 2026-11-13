@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B5E20" id="metaTheme">
+<title>Arabia Taxi Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+<script>
+try { if (localStorage.getItem("arabiaTaxi:theme") === "dark") document.documentElement.setAttribute("data-theme", "dark"); } catch (e) {}
+</script>
+<style>
+:root {
+  --brand-green: #1B5E20; --brand-green-deep: #134417; --on-brand-green: #FFFFFF; --strip: #1B5E20;
+  --page: #F2F3F6; --card: #FFFFFF; --ink: #111827; --ink-soft: #374151; --muted: #6B7280;
+  --line: #E3E6EC; --line-soft: #EEF0F4; --green: #D9F5B4; --green-ink: #44652B; --green-ink2: #3F5B2A;
+  --blue: #D6E9FA; --orange: #F8E1CB; --sun: #FDF2BA; --pink: #FAD5D8; --red: #A61B2B; --red-soft: #7A2230;
+  --row: #D5EAFA; --row-today: #FEF3BD; --row-off: #F8E1CB; --off-ink: #9A4A12; --field: #FFFFFF; --btn: #FFFFFF;
+  --chip: rgba(255,255,255,0.5); --hr: rgba(0,0,0,0.1); --brand: #005CBB; --navy: #00428E;
+  --toast-bg: #111827; --toast-ink: #FFFFFF;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --strip: #0B0C0F; --page: #0B0C0F; --card: #17191E; --ink: #F2F3F5; --ink-soft: #C6CBD3; --muted: #8E96A3;
+  --line: #2B2F37; --line-soft: #23262C; --green: #1E3523; --green-ink: #9CCB99; --green-ink2: #8FB98C;
+  --blue: #172A40; --orange: #3A2A1C; --sun: #3A3513; --pink: #40202A; --red: #FF8E9B; --red-soft: #F3B5BD;
+  --row: #162131; --row-today: #3A3513; --row-off: #3A2A1C; --off-ink: #FFB27A; --field: #0E1014; --btn: #242932;
+  --chip: rgba(255,255,255,0.08); --hr: rgba(255,255,255,0.14); --brand: #2A7BE0; --navy: #0A2447;
+  --toast-bg: #F2F3F5; --toast-ink: #111827; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 16px; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.35 var(--font); -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--strip); z-index: 30; }
+body.overlay-open { overflow: hidden; }
+[hidden] { display: none !important; }
+.page { max-width: 560px; margin: 0 auto; padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 18px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+button { font: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
+.field input:focus-visible, .idbox input:focus-visible { outline: 0; }
+
+.brand { background: var(--brand-green); color: var(--on-brand-green); border-radius: 14px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+.badge { width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--brand-green-deep); display: grid; place-items: center; }
+.badge .i { width: 19px; height: 19px; stroke-width: 1.8; }
+.brand-text { flex: 1; min-width: 0; }
+.brand h1 { margin: 0; font: 800 clamp(17px, 5vw, 19px)/1.15 var(--font); }
+.brand p { margin: 1px 0 0; font: 500 12.5px var(--font); opacity: 0.9; }
+.brand-foot { flex: none; display: flex; gap: 6px; }
+.theme-btn, .help-btn { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 9px 0 7px; border: 0; border-radius: 999px; background: rgba(255,255,255,0.16); color: var(--on-brand-green); font: 700 12.5px var(--font); }
+.theme-btn .i, .help-btn .i { width: 14px; height: 14px; }
+
+.hero-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 1px; }
+.idbox { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 8px; background: var(--chip); border: 1px solid var(--hr); border-radius: 9px; }
+.idbox label { font: 700 13px var(--font); color: var(--green-ink); white-space: nowrap; }
+.idbox input { width: 82px; min-width: 0; border: 0; background: transparent; font: 700 16px var(--font); color: var(--ink); padding: 0; font-variant-numeric: tabular-nums; }
+
+.month { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0; }
+.month h2 { margin: 0; font: 700 22px/1.15 var(--font); text-align: center; }
+.nav { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--card); color: var(--ink); display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+.label { font: 600 12.5px var(--font); text-transform: uppercase; letter-spacing: 0.02em; }
+.hero { background: var(--green); border-radius: 14px; padding: 6px 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.hero-main { min-width: 0; }
+.big { font: 800 clamp(26px, 8.2vw, 34px)/1.02 var(--font); letter-spacing: -0.01em; margin: 1px 0 2px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.hero .sub { font: 500 14px/1.2 var(--font); }
+.days-left { flex: none; min-width: 68px; padding: 5px 8px; border-radius: 12px; background: var(--chip); text-align: center; }
+.days-left b { display: block; font: 800 28px/1.0 var(--font); color: var(--red); font-variant-numeric: tabular-nums; }
+.days-left span { font: 500 11.5px var(--font); }
+.bonus-box { flex: none; min-width: 80px; padding: 6px 8px; border-radius: 12px; background: var(--chip); text-align: center; }
+.bonus-box b { display: block; font: 800 24px/1.0 var(--font); color: var(--red); font-variant-numeric: tabular-nums; }
+.bonus-box span { font: 600 11px var(--font); color: var(--red-soft); text-transform: uppercase; }
+.hero hr { border: 0; border-top: 1px solid var(--hr); margin: 6px 0 5px; }
+.hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; font: 500 12.5px/1.2 var(--font); color: var(--green-ink2); }
+.off-pill { padding: 2px 6px; border-radius: 6px; background: var(--chip); font-size: 12px; font-weight: 600; color: var(--green-ink); }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.stat { min-width: 0; padding: 9px 11px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.stat .label { font-size: 11px; letter-spacing: 0; line-height: 1.2; }
+.stat .v { font: 800 clamp(18px, 5.6vw, 22px)/1.1 var(--font); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.stat .v.txt { font-size: 18px; }
+.s-avg { background: var(--blue); }
+.s-need { background: var(--green); }
+.s-min { background: var(--orange); }
+.s-max { background: var(--sun); }
+
+.left { margin-top: 8px; padding: 10px 12px; border-radius: 15px; background: var(--pink); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.left .label { color: var(--red); }
+.left .v { font: 800 clamp(26px, 8.2vw, 34px)/1.05 var(--font); color: var(--red); margin: 2px 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.left .s { font: 500 13px/1.2 var(--font); color: var(--red-soft); }
+.left-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+
+.days-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 16px 0 4px; }
+.days-head h3 { margin: 0; font: 700 22px/1.15 var(--font); }
+.days-head .unit { font: 600 14px var(--font); color: var(--ink-soft); }
+.legend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; margin-bottom: 8px; font: 500 12.5px var(--font); color: var(--muted); }
+.legend .today-key { display: inline-flex; align-items: center; gap: 5px; }
+.legend .today-key[data-off="true"] { visibility: hidden; }
+.dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+.days { display: flex; flex-direction: column; gap: 6px; }
+.day { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 4px 6px; border-radius: 13px; background: var(--row); scroll-margin-bottom: 64px; box-shadow: 0 0 0 1px rgba(60,120,190,0.05), 0 1px 4px rgba(60,120,190,0.08); }
+.day.is-today { background: var(--row-today); box-shadow: 0 0 0 1px rgba(200,160,0,0.1), 0 1px 4px rgba(200,160,0,0.1); }
+.day.is-off { background: var(--row-off); box-shadow: 0 0 0 1px rgba(200,110,40,0.08), 0 1px 4px rgba(200,110,40,0.08); }
+.dn { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.dn b { font: 800 17px var(--font); display: inline-flex; align-items: flex-start; gap: 2px; font-variant-numeric: tabular-nums; }
+.dn b .dot { margin-top: 2px; }
+.dn span { font: 500 12px var(--font); color: var(--ink-soft); margin-top: 1px; }
+.field { display: flex; align-items: center; gap: 6px; min-width: 0; height: 38px; padding: 0 10px; background: var(--field); border-radius: 10px; }
+.field input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); font: 700 20px var(--font); text-align: right; padding: 0; font-variant-numeric: tabular-nums; }
+.field input::placeholder { color: var(--ink-soft); opacity: 1; font-weight: 600; }
+.field .cur { font: 600 11px var(--font); letter-spacing: 0.05em; color: var(--muted); }
+.day.is-off .field input { text-align: center; color: var(--muted); font-weight: 600; }
+.day.is-off .cur { display: none; }
+.day.invalid .field { box-shadow: inset 0 0 0 2px var(--red); }
+.off-btn { min-width: 60px; height: 38px; padding: 0 8px; border: 0; border-radius: 10px; background: var(--btn); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 15px var(--font); }
+.off-btn .i { width: 16px; height: 16px; }
+.day.is-off .off-btn { color: var(--off-ink); }
+.foot-note { margin: 12px 6px 0; text-align: center; font: 500 13px/1.4 var(--font); color: var(--muted); }
+
+.end { margin-top: 14px; }
+.status { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 22px; margin-bottom: 6px; font: 500 12.5px var(--font); color: var(--muted); }
+.status .i { width: 14px; height: 14px; }
+.status.saving { color: var(--ink-soft); }
+.status.error { color: var(--red); }
+.export { width: 100%; min-height: 46px; border: 0; border-radius: 13px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font: 700 17px var(--font); box-shadow: 0 2px 6px rgba(0,66,142,0.35); }
+.export:active { filter: brightness(0.92); }
+.credit { margin-top: 8px; background: var(--navy); color: #fff; text-align: center; font: 500 12.5px var(--font); padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px)); }
+.credit b { letter-spacing: 0.03em; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 40; display: flex; align-items: center; gap: 6px; width: max-content; max-width: calc(100vw - 32px); padding: 7px 12px; border-radius: 999px; background: var(--toast-bg); color: var(--toast-ink); font: 600 13px var(--font); pointer-events: none; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+.toast .i { width: 14px; height: 14px; }
+.toast.error { background: #A61B2B; color: #fff; }
+
+.sheet { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; background: var(--page); }
+.sheet-bar { display: flex; align-items: center; gap: 10px; background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.12); padding: calc(6px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 6px max(12px, env(safe-area-inset-left, 0px)); }
+.sheet-bar h2 { margin: 0; font: 700 18px var(--font); }
+.icon-btn { width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--page); color: var(--ink); display: grid; place-items: center; }
+.sheet-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px max(12px, env(safe-area-inset-right, 0px)) 12px max(12px, env(safe-area-inset-left, 0px)); }
+
+.help-inner { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px; }
+.help-group { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.help-group h3 { margin: 0; padding: 8px 12px; background: var(--brand-green); color: var(--on-brand-green); font: 700 13.5px var(--font); }
+.help-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border: 0; border-top: 1px solid var(--line-soft); background: transparent; min-height: 48px; text-align: left; color: var(--ink); text-decoration: none; }
+.help-group h3 + .help-row { border-top: 0; }
+.help-row:active { background: var(--line-soft); }
+.help-row .ico { width: 30px; height: 30px; flex: none; border-radius: 50%; background: var(--line-soft); display: grid; place-items: center; color: var(--brand); }
+.help-row .ico .i { width: 15px; height: 15px; }
+.help-row .txt { flex: 1; min-width: 0; }
+.help-row .lbl { display: block; font: 600 12px var(--font); color: var(--muted); }
+.help-row .val { display: block; font: 700 15.5px var(--font); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.help-row.plain { cursor: default; }
+.help-row.plain:active { background: transparent; }
+.help-note { margin: 2px 4px 0; text-align: center; font: 500 12.5px/1.4 var(--font); color: var(--muted); }
+
+.paper { max-width: 560px; margin: 0 auto; background: #FFFFFF !important; color: #111827 !important; border: 1px solid #E3E6EC; border-radius: 14px; overflow: hidden; }
+.paper-head { background: #1B5E20 !important; color: #FFFFFF !important; padding: 10px 14px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.paper-head h3 { margin: 0; font: 800 18px/1.2 var(--font); color: #FFFFFF !important; }
+.paper-head p { margin: 2px 0 0; font: 500 13px var(--font); opacity: 0.9; color: #FFFFFF !important; }
+.paper-body { padding: 12px 14px 14px; background: #FFFFFF !important; color: #111827 !important; }
+.meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 12px; }
+.meta div, .sum div { min-width: 0; }
+.meta dt, .sum dt { font: 600 11.5px var(--font); text-transform: uppercase; letter-spacing: 0.04em; color: #6B7280 !important; }
+.meta dd, .sum dd { margin: 2px 0 0; font: 700 16px var(--font); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; color: #111827 !important; }
+.sum { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin: 0 0 14px; padding: 10px 0; border-block: 1px solid #E3E6EC; }
+.tbl-wrap { overflow-x: auto; }
+.paper table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.paper th { text-align: left; font: 600 11.5px var(--font); text-transform: uppercase; letter-spacing: 0.04em; color: #6B7280 !important; padding: 5px 0; border-bottom: 1px solid #E3E6EC; }
+.paper td { padding: 6px 0; font: 500 15px var(--font); border-bottom: 1px solid #EEF0F4; color: #111827 !important; }
+.paper .num { text-align: right; }
+.paper td.dim { color: #9CA3AF !important; }
+.paper tfoot td { font-weight: 800; border-bottom: 0; padding-top: 8px; color: #111827 !important; }
+.gen { margin: 10px 0 0; font: 500 12px var(--font); color: #6B7280 !important; }
+.report-actions { background: var(--card); box-shadow: 0 -4px 14px rgba(0,0,0,0.12); padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+.report-actions > * { max-width: 560px; margin-inline: auto; }
+.msg { min-height: 18px; margin-bottom: 6px; text-align: center; font: 500 13px var(--font); color: var(--ink-soft); }
+.btn { width: 100%; min-height: 42px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 6px; font: 700 15px var(--font); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-size: 16px; min-height: 46px; }
+.btn + .btn { margin-top: 8px; }
+
+/* ===== PRINT FIX ===== */
+@media print {
+  @page { margin: 10mm; size: A4; }
+
+  html, body {
+    background: #fff !important;
+    overflow: visible !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body::before { display: none !important; }
+
+  #app,
+  .toast,
+  #help,
+  .sheet-bar,
+  .report-actions,
+  .msg { display: none !important; }
+
+  #report {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    background: #fff !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    z-index: auto !important;
+  }
+  #report[hidden] { display: block !important; }
+
+  #reportScroll {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .paper {
+    background: #fff !important;
+    color: #111827 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .paper-head {
+    background: #1B5E20 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .paper-body { background: #fff !important; color: #111827 !important; }
+  .tbl-wrap { overflow: visible !important; }
+  .paper table { width: 100% !important; }
+  .paper tr { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 11l1.5-4.2A2 2 0 0 1 8.4 5.5h7.2a2 2 0 0 1 1.9 1.3L19 11"/><rect x="3" y="11" width="18" height="6.5" rx="2"/><path d="M5.5 17.5V20M18.5 17.5V20"/><circle cx="7.3" cy="14.3" r=".7"/><circle cx="16.7" cy="14.3" r=".7"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16v.1"/></symbol>
+    <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v11m0 0l-4-4m4 4l4-4"/><path d="M4 14v5a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4l4 4"/><path d="M5 11v8.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V11"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v7H7z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.2A8 8 0 0 1 9.8 4a8 8 0 1 0 10.2 10.2z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 1c0 1.7-2.5 2.2-2.5 3.9M12 17.2v.1"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h2.8l1.4 4.1-1.9 1.3a11 11 0 0 0 5.2 5.2l1.3-1.9 4.1 1.4v2.8a2 2 0 0 1-2.2 2A16 16 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></symbol>
+  </defs>
+</svg>
+
+<div id="app">
+  <div class="page">
+    <header class="brand">
+      <div class="badge"><svg class="i"><use href="#i-car"/></svg></div>
+      <div class="brand-text">
+        <h1>Arabia Taxi LLC</h1>
+        <p>Monthly Income Tracker</p>
+      </div>
+      <div class="brand-foot">
+        <button class="help-btn" id="helpBtn" type="button" aria-label="Open help and contacts"><svg class="i"><use href="#i-help"/></svg><span>Help</span></button>
+        <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch to black theme"><svg class="i"><use href="#i-moon"/></svg><span>Black</span></button>
+      </div>
+    </header>
+
+    <nav class="month" aria-label="Month">
+      <button class="nav" id="prev" type="button" aria-label="Previous month"><svg class="i"><use href="#i-prev"/></svg></button>
+      <h2 id="monthLabel">—</h2>
+      <button class="nav" id="next" type="button" aria-label="Next month"><svg class="i"><use href="#i-next"/></svg></button>
+    </nav>
+
+    <section class="hero" aria-labelledby="totalLabel">
+      <div class="hero-head">
+        <div class="label" id="totalLabel">Total income</div>
+        <div class="idbox">
+          <label for="driverId">ID</label>
+          <input id="driverId" inputmode="numeric" maxlength="20" autocomplete="off" value="3008703">
+        </div>
+      </div>
+      <div class="hero-top">
+        <div class="hero-main">
+          <div class="big" id="total">AED 0.00</div>
+          <div class="sub" id="workedLine">From 0 worked days</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <div class="days-left" aria-label="Days left"><b id="daysLeft">0</b><span>Days left</span></div>
+          <div class="bonus-box" aria-label="Bonus percentage"><b id="bonus">—</b><span>Target</span></div>
+        </div>
+      </div>
+      <hr>
+      <div class="hero-foot">
+        <div id="monthTarget">Monthly target: AED 0.00</div>
+        <div class="off-pill" id="offLine">0 Off days</div>
+      </div>
+    </section>
+
+    <section class="left" aria-label="Target left and needed per day">
+      <div class="left-top">
+        <div>
+          <div class="label">Target left</div>
+          <div class="v" id="leftTarget">AED 0.00</div>
+          <div class="s" id="leftSub">Remaining to monthly target</div>
+        </div>
+        <div class="stat s-need" style="flex: none; min-width: 90px; padding: 6px 8px; border-radius: 12px; box-shadow: none; text-align: center;">
+          <div class="label" style="font-size: 11px;">Needed / Day</div>
+          <div class="v" id="perDay" style="font-size: 19px; line-height: 1.1;">—</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="days-head">
+      <h3>Daily income</h3>
+      <div class="unit">AED</div>
+    </div>
+    <div class="legend">
+      <span class="today-key" id="todayKey"><i class="dot"></i>Today</span>
+      <span>Tap to edit · Off to skip · Undo to restore</span>
+    </div>
+    <div class="days" id="days"></div>
+    <p class="foot-note" id="footNote"></p>
+
+    <section class="grid" aria-label="Month statistics">
+      <div class="stat s-avg"><div class="label">Daily Avg</div><div class="v" id="avg">—</div></div>
+      <div class="stat s-min"><div class="label">Low Day</div><div class="v" id="min">—</div></div>
+      <div class="stat s-max"><div class="label">Top Day</div><div class="v" id="max">—</div></div>
+    </section>
+
+    <section class="end" aria-label="Report">
+      <div class="status" id="status" role="status"><svg class="i"><use href="#i-check"/></svg><span>Saved on this device · Offline</span></div>
+      <button class="export" id="exportBtn" type="button"><svg class="i"><use href="#i-export"/></svg>Monthly PDF Report</button>
+    </section>
+  </div>
+  <footer class="credit">Powered by <b>UmaiR 8703</b></footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="sheet" id="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
+  <div class="sheet-bar">
+    <button class="icon-btn" id="helpClose" type="button" aria-label="Close help"><svg class="i"><use href="#i-close"/></svg></button>
+    <h2 id="helpTitle">Help &amp; Contacts</h2>
+  </div>
+  <div class="sheet-scroll" id="helpScroll">
+    <div class="help-inner" id="helpList"></div>
+  </div>
+</div>
+
+<div class="sheet" id="report" role="dialog" aria-modal="true" aria-labelledby="reportTitle" hidden>
+  <div class="sheet-bar">
+    <button class="icon-btn" id="reportClose" type="button" aria-label="Close report"><svg class="i"><use href="#i-close"/></svg></button>
+    <h2 id="reportTitle">Monthly PDF Report</h2>
+  </div>
+  <div class="sheet-scroll" id="reportScroll"><article class="paper" id="paper"></article></div>
+  <div class="report-actions">
+    <div class="msg" id="reportMsg" role="status" aria-live="polite"></div>
+    <button class="btn primary" id="downloadPdfBtn" type="button"><svg class="i"><use href="#i-export"/></svg>Download PDF</button>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn" id="printBtn" type="button" style="flex:1; margin-top:0;"><svg class="i"><use href="#i-print"/></svg>Print</button>
+      <button class="btn" id="shareBtn" type="button" style="flex:1; margin-top:0;"><svg class="i"><use href="#i-share"/></svg>Share</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var COMPANY = "Arabia Taxi LLC";
+  var TARGET = 350;
+  var TIERS = [[350, 35], [300, 30], [275, 25], [250, 20], [225, 15], [200, 10]];
+  var LOWEST_PCT = 5;
+  var DEFAULT_DRIVER_ID = "3008703";
+  var ID_KEY = "arabiaTaxi:driverId";
+  var THEME_KEY = "arabiaTaxi:theme";
+
+  var CONTACTS = [
+    { group: "Email", items: [
+      { label: "HR Email", value: "hr-atdxb@arabiataxi.ae", kind: "mail" },
+      { label: "Reception Email", value: "dxb.reception@arabiataxi.ae", kind: "mail" },
+      { label: "Fleet Email", value: "fleet.dxb@arabiataxi.ae", kind: "mail" }
+    ]},
+    { group: "Phone numbers", items: [
+      { label: "Meter Room", value: "04 223 1758", kind: "tel" },
+      { label: "HR", value: "052 609 7125", kind: "tel" },
+      { label: "Accident Report", value: "054 792 0022", kind: "tel" },
+      { label: "Recovery (Day 1)", value: "052 601 3158", kind: "tel" },
+      { label: "Recovery (Day 2)", value: "054 791 9982", kind: "tel" },
+      { label: "Recovery (Night 1)", value: "052 908 4278", kind: "tel" },
+      { label: "Recovery (Night 2)", value: "056 893 7558", kind: "tel" }
+    ]},
+    { group: "P.O. Boxes", items: [
+      { label: "Arabia Taxi P.O. Box", value: "35598", kind: "text" },
+      { label: "HR P.O. Box", value: "11745", kind: "text" }
+    ]},
+    { group: "Helplines", items: [
+      { label: "RTA Hotline", value: "04 290 7290", kind: "tel" },
+      { label: "Hala Helpline", value: "04 440 5200", kind: "tel" },
+      { label: "Yango Landline", value: "04 879 9302", kind: "tel" },
+      { label: "Yango Mobile", value: "054 288 8353", kind: "tel" },
+      { label: "RTA Lost & Found", value: "+971 4 605 1711", kind: "tel" }
+    ]},
+    { group: "Powered by", items: [
+      { label: "Name", value: "Umair", kind: "text" },
+      { label: "Mobile", value: "0563863688", kind: "tel" },
+      { label: "Email", value: "M.umairroy@gmail.com", kind: "mail" },
+      { label: "Staff ID", value: "8703", kind: "text" }
+    ]}
+  ];
+
+  var view = { y: new Date().getFullYear(), m: new Date().getMonth() };
+  var data = {};
+  var memo = {};
+  var saveTimer = null;
+  var toastTimer = null;
+  var opener = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var pad = function (n) { return String(n).padStart(2, "0"); };
+  var fmt = function (n) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var aed = function (n) { return "AED " + fmt(n); };
+  var plural = function (n, one, many) { return n + " " + (n === 1 ? one : many); };
+  var esc = function (s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var daysIn = function () { return new Date(view.y, view.m + 1, 0).getDate(); };
+  var storageKey = function () { return "arabiaTaxi:" + view.y + "-" + pad(view.m + 1); };
+  var monthName = function () { return new Date(view.y, view.m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
+  var weekday = function (d) { return new Date(view.y, view.m, d).toLocaleDateString("en-US", { weekday: "short" }); };
+  var driverId = function () { return $("driverId").value.trim() || DEFAULT_DRIVER_ID; };
+  var icon = function (name) { return '<svg class="i"><use href="#i-' + name + '"/></svg>'; };
+
+  function isDark() { return document.documentElement.getAttribute("data-theme") === "dark"; }
+  function syncThemeUI() {
+    var dark = isDark();
+    $("themeBtn").innerHTML = icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Light" : "Black") + "</span>";
+    $("themeBtn").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to black theme");
+    $("metaTheme").setAttribute("content", dark ? "#0B0C0F" : "#1B5E20");
+  }
+  $("themeBtn").addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    syncThemeUI();
+  });
+
+  function toast(msg, kind) {
+    var el = $("toast");
+    el.className = "toast" + (kind === "error" ? " error" : "");
+    el.innerHTML = icon(kind === "error" ? "alert" : "check") + "<span>" + esc(msg) + "</span>";
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.hidden = true; }, 1800);
+  }
+
+  function setStatus(text, kind) {
+    var el = $("status");
+    el.className = "status" + (kind ? " " + kind : "");
+    el.innerHTML = icon(kind === "error" ? "alert" : kind === "saving" ? "clock" : "check") + "<span>" + esc(text) + "</span>";
+  }
+
+  function loadData() {
+    memo = {};
+    try {
+      var raw = localStorage.getItem(storageKey());
+      data = raw ? JSON.parse(raw) : {};
+    } catch (e) { data = {}; }
+  }
+
+  function saveData() {
+    setStatus("Saving…", "saving");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try {
+        localStorage.setItem(storageKey(), JSON.stringify(data));
+        setStatus("Saved on this device · Offline");
+      } catch (e) {
+        setStatus("Could not save on this device", "error");
+      }
+    }, 250);
+  }
+
+  function getVal(d) {
+    if (memo[d] !== undefined) return memo[d];
+    var v = data[d];
+    if (v === "off") { memo[d] = "off"; return "off"; }
+    var n = Number(v);
+    memo[d] = (isFinite(n) && n > 0) ? n : 0;
+    return memo[d];
+  }
+
+  function setVal(d, v) {
+    if (v === "off") {
+      data[d] = "off";
+      memo[d] = "off";
+    } else {
+      var n = Number(v);
+      if (!isFinite(n) || n <= 0) { delete data[d]; delete memo[d]; }
+      else { data[d] = n; memo[d] = n; }
+    }
+    saveData();
+  }
+
+  function computeStats() {
+    var total = 0, worked = 0, off = 0, days = daysIn(), lows = [], highs = [];
+    var today = new Date();
+    var isCurrentMonth = (today.getFullYear() === view.y && today.getMonth() === view.m);
+    for (var d = 1; d <= days; d++) {
+      var v = getVal(d);
+      if (v === "off") { off++; continue; }
+      if (v > 0) { worked++; total += v; lows.push(v); highs.push(v); }
+    }
+    var remaining = Math.max(0, days - off - worked);
+    var daysLeft = remaining;
+    var target = TARGET * Math.max(0, days - off);
+    var left = Math.max(0, target - total);
+    var perDay = daysLeft > 0 ? left / daysLeft : 0;
+    var avg = worked > 0 ? total / worked : 0;
+    var min = lows.length ? Math.min.apply(null, lows) : 0;
+    var max = highs.length ? Math.max.apply(null, highs) : 0;
+    var pct = 0;
+    if (avg >= TIERS[0][0]) pct = TIERS[0][1];
+    else if (avg > 0) {
+      pct = LOWEST_PCT;
+      for (var i = 1; i < TIERS.length; i++) {
+        if (avg >= TIERS[i][0]) { pct = TIERS[i][1]; break; }
+      }
+    }
+    return {
+      total: total, worked: worked, off: off, days: days, daysLeft: daysLeft,
+      target: target, left: left, perDay: perDay, avg: avg, min: min, max: max,
+      pct: pct, isCurrentMonth: isCurrentMonth, lows: lows, highs: highs
+    };
+  }
+
+  function renderHero() {
+    var s = computeStats();
+    $("total").textContent = aed(s.total);
+    $("workedLine").textContent = "From " + plural(s.worked, "worked day", "worked days");
+    $("daysLeft").textContent = s.daysLeft;
+    $("bonus").textContent = s.worked ? s.pct + "%" : "—";
+    $("monthTarget").textContent = "Monthly target: " + aed(s.target);
+    $("offLine").textContent = plural(s.off, "Off day", "Off days");
+    $("leftTarget").textContent = aed(s.left);
+    $("leftSub").textContent = s.left > 0 ? "Remaining to monthly target" : "Target reached";
+    $("perDay").textContent = s.perDay > 0 ? fmt(s.perDay) : "—";
+    $("avg").textContent = s.worked ? fmt(s.avg) : "—";
+    $("min").textContent = s.worked ? fmt(s.min) : "—";
+    $("max").textContent = s.worked ? fmt(s.max) : "—";
+    var todayKey = $("todayKey");
+    todayKey.setAttribute("data-off", s.isCurrentMonth ? "false" : "true");
+    $("footNote").textContent = s.worked ? plural(s.worked, "day recorded", "days recorded") + " · " + plural(s.off, "off day", "off days") : "Start entering daily income to see statistics.";
+  }
+
+  function renderDays() {
+    var wrap = $("days");
+    var days = daysIn();
+    var today = new Date();
+    var isCurrent = today.getFullYear() === view.y && today.getMonth() === view.m;
+    var todayDate = today.getDate();
+    var html = "";
+    for (var d = 1; d <= days; d++) {
+      var v = getVal(d);
+      var isToday = isCurrent && d === todayDate;
+      var isOff = v === "off";
+      var val = isOff ? "" : (v > 0 ? v : "");
+      var cls = "day" + (isToday ? " is-today" : "") + (isOff ? " is-off" : "");
+      html += '<div class="' + cls + '" data-day="' + d + '">' +
+        '<div class="dn"><b>' + d + (isToday ? '<i class="dot"></i>' : "") + '</b><span>' + weekday(d) + '</span></div>' +
+        '<label class="field">' +
+          '<input type="text" inputmode="decimal" data-day="' + d + '" placeholder="' + (isOff ? "Off" : "0.00") + '" value="' + (val === "" ? "" : esc(String(val))) + '"' + (isOff ? " readonly" : "") + '>' +
+          '<span class="cur">AED</span>' +
+        '</label>' +
+        '<button class="off-btn" type="button" data-day="' + d + '">' + (isOff ? icon("undo") + "Undo" : icon("ban") + "Off") + '</button>' +
+      '</div>';
+    }
+    wrap.innerHTML = html;
+  }
+
+  function render() {
+    $("monthLabel").textContent = monthName();
+    renderHero();
+    renderDays();
+  }
+
+  $("prev").addEventListener("click", function () {
+    view.m--;
+    if (view.m < 0) { view.m = 11; view.y--; }
+    loadData();
+    render();
+  });
+  $("next").addEventListener("click", function () {
+    view.m++;
+    if (view.m > 11) { view.m = 0; view.y++; }
+    loadData();
+    render();
+  });
+
+  $("days").addEventListener("input", function (e) {
+    var inp = e.target.closest("input[data-day]");
+    if (!inp) return;
+    var d = Number(inp.getAttribute("data-day"));
+    var raw = inp.value.replace(/[^0-9.]/g, "");
+    var parts = raw.split(".");
+    if (parts.length > 2) raw = parts[0] + "." + parts.slice(1).join("");
+    inp.value = raw;
+    var n = parseFloat(raw);
+    inp.closest(".day").classList.remove("invalid");
+    if (raw === "") { setVal(d, 0); }
+    else if (!isFinite(n) || n < 0) { inp.closest(".day").classList.add("invalid"); return; }
+    else { setVal(d, n); }
+    renderHero();
+  });
+
+  $("days").addEventListener("blur", function (e) {
+    var inp = e.target.closest("input[data-day]");
+    if (!inp) return;
+    var d = Number(inp.getAttribute("data-day"));
+    var n = parseFloat(inp.value);
+    if (isFinite(n) && n > 0) inp.value = fmt(n);
+    else inp.value = "";
+  }, true);
+
+  $("days").addEventListener("click", function (e) {
+    var btn = e.target.closest("button.off-btn");
+    if (!btn) return;
+    var d = Number(btn.getAttribute("data-day"));
+    var v = getVal(d);
+    if (v === "off") setVal(d, 0);
+    else setVal(d, "off");
+    renderHero();
+    renderDays();
+  });
+
+  $("driverId").addEventListener("input", function () {
+    try { localStorage.setItem(ID_KEY, this.value); } catch (e) {}
+  });
+
+  function restoreId() {
+    try {
+      var saved = localStorage.getItem(ID_KEY);
+      if (saved) $("driverId").value = saved;
+    } catch (e) {}
+  }
+
+  function openHelp() {
+    opener = document.activeElement;
+    var list = $("helpList");
+    var html = "";
+    CONTACTS.forEach(function (grp) {
+      html += '<div class="help-group"><h3>' + esc(grp.group) + '</h3>';
+      grp.items.forEach(function (it) {
+        var ico = it.kind === "mail" ? "mail" : it.kind === "tel" ? "phone" : "pin";
+        var tag = it.kind === "mail" ? "a" : it.kind === "tel" ? "a" : "div";
+        var href = it.kind === "mail" ? "mailto:" + it.value : it.kind === "tel" ? "tel:" + it.value.replace(/\s+/g, "") : "";
+        var attrs = tag === "a" ? ' href="' + esc(href) + '"' : '';
+        var cls = "help-row" + (tag === "div" ? " plain" : "");
+        html += '<' + tag + ' class="' + cls + '"' + attrs + '>' +
+          '<span class="ico">' + icon(ico) + '</span>' +
+          '<span class="txt"><span class="lbl">' + esc(it.label) + '</span><span class="val">' + esc(it.value) + '</span></span>' +
+        '</' + tag + '>';
+      });
+      html += '</div>';
+    });
+    html += '<p class="help-note">Tap a phone or email to open your device app.</p>';
+    list.innerHTML = html;
+    $("help").hidden = false;
+    document.body.classList.add("overlay-open");
+    $("helpClose").focus();
+  }
+
+  function closeHelp() {
+    $("help").hidden = true;
+    document.body.classList.remove("overlay-open");
+    if (opener && opener.focus) opener.focus();
+  }
+
+  $("helpBtn").addEventListener("click", openHelp);
+  $("helpClose").addEventListener("click", closeHelp);
+
+  function buildReport() {
+    var s = computeStats();
+    var days = daysIn();
+    var rows = "";
+    for (var d = 1; d <= days; d++) {
+      var v = getVal(d);
+      var txt = v === "off" ? "Off" : (v > 0 ? fmt(v) : "—");
+      rows += "<tr>" +
+        "<td>" + d + " " + weekday(d) + "</td>" +
+        '<td class="num' + (v === "off" || !(v > 0) ? " dim" : "") + '">' + txt + "</td>" +
+      "</tr>";
+    }
+    var html = '' +
+      '<div class="paper-head">' +
+        '<h3>' + esc(COMPANY) + ' — Monthly Report</h3>' +
+        '<p>' + esc(monthName()) + ' · Driver ID ' + esc(driverId()) + '</p>' +
+      '</div>' +
+      '<div class="paper-body">' +
+        '<dl class="meta">' +
+          '<div><dt>Driver ID</dt><dd>' + esc(driverId()) + '</dd></div>' +
+          '<div><dt>Month</dt><dd>' + esc(monthName()) + '</dd></div>' +
+        '</dl>' +
+        '<dl class="sum">' +
+          '<div><dt>Total income</dt><dd>' + aed(s.total) + '</dd></div>' +
+          '<div><dt>Monthly target</dt><dd>' + aed(s.target) + '</dd></div>' +
+          '<div><dt>Target left</dt><dd>' + aed(s.left) + '</dd></div>' +
+          '<div><dt>Target %</dt><dd>' + (s.worked ? s.pct + "%" : "—") + '</dd></div>' +
+          '<div><dt>Worked days</dt><dd>' + s.worked + '</dd></div>' +
+          '<div><dt>Off days</dt><dd>' + s.off + '</dd></div>' +
+          '<div><dt>Daily average</dt><dd>' + (s.worked ? aed(s.avg) : "—") + '</dd></div>' +
+          '<div><dt>Lowest / Highest</dt><dd>' + (s.worked ? aed(s.min) + " / " + aed(s.max) : "—") + '</dd></div>' +
+        '</dl>' +
+        '<div class="tbl-wrap"><table>' +
+          '<thead><tr><th>Day</th><th class="num">Income (AED)</th></tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+          '<tfoot><tr><td>Total</td><td class="num">' + fmt(s.total) + '</td></tr></tfoot>' +
+        '</table></div>' +
+        '<p class="gen">Generated ' + new Date().toLocaleString("en-US") + ' · Arabia Taxi Tracker</p>' +
+      '</div>';
+    $("paper").innerHTML = html;
+  }
+
+  function openReport() {
+    opener = document.activeElement;
+    $("reportMsg").textContent = "";
+    buildReport();
+    $("report").hidden = false;
+    $("report").dataset.opened = "1";
+    document.body.classList.add("overlay-open");
+    $("reportClose").focus();
+  }
+
+  function closeReport() {
+    $("report").hidden = true;
+    $("report").dataset.opened = "";
+    document.body.classList.remove("overlay-open");
+    if (opener && opener.focus) opener.focus();
+  }
+
+  $("exportBtn").addEventListener("click", openReport);
+  $("reportClose").addEventListener("click", closeReport);
+
+  function getPdfFilename() {
+    var m = monthName().replace(/\s+/g, "_");
+    var id = driverId().replace(/[^a-zA-Z0-9_-]/g, "") || DEFAULT_DRIVER_ID;
+    return "Arabia_Taxi_Report_" + m + "_" + id + ".pdf";
+  }
+
+  function triggerSystemPrint() {
+    var reportEl = $("report");
+    var wasHidden = reportEl.hasAttribute("hidden");
+    if (wasHidden) reportEl.removeAttribute("hidden");
+    document.body.classList.remove("overlay-open");
+
+    var restore = function () {
+      if (wasHidden) reportEl.setAttribute("hidden", "");
+      document.body.classList.add("overlay-open");
+    };
+    var fallback = setTimeout(restore, 8000);
+    var onAfter = function () {
+      clearTimeout(fallback);
+      restore();
+      window.removeEventListener("afterprint", onAfter);
+    };
+    window.addEventListener("afterprint", onAfter);
+
+    setTimeout(function () {
+      try {
+        window.print();
+      } catch (err) {
+        $("reportMsg").textContent = "Print not supported on this device. Use Share instead.";
+      }
+    }, 120);
+  }
+
+  $("downloadPdfBtn").addEventListener("click", async function () {
+    var btn = $("downloadPdfBtn");
+    var msgEl = $("reportMsg");
+    var filename = getPdfFilename();
+
+    if (typeof window.html2pdf === "undefined") {
+      msgEl.textContent = "Opening system print dialog to save PDF...";
+      triggerSystemPrint();
+      return;
+    }
+
+    btn.disabled = true;
+    msgEl.textContent = "Generating PDF file, please wait...";
+
+    var paperEl = $("paper");
+    
+    try {
+      var opt = {
+        margin: [10, 10, 10, 10],
+        filename: filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#FFFFFF", scrollY: 0 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
+
+      await window.html2pdf().set(opt).from(paperEl).save();
+      msgEl.textContent = "PDF downloaded: " + filename;
+      toast("PDF downloaded");
+    } catch (err) {
+      msgEl.textContent = "Direct download blocked — opening Print / Save as PDF...";
+      triggerSystemPrint();
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $("printBtn").addEventListener("click", function () {
+    $("reportMsg").textContent = "";
+    triggerSystemPrint();
+  });
+
+  $("shareBtn").addEventListener("click", async function () {
+    var s = computeStats();
+    var text = COMPANY + "\n" + monthName() + "\nDriver ID: " + driverId() +
+      "\nTotal: " + aed(s.total) +
+      "\nWorked: " + s.worked + " days · Off: " + s.off + " days" +
+      "\nTarget: " + aed(s.target) + " · Left: " + aed(s.left);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Arabia Taxi Monthly Report", text: text });
+        return;
+      } catch (e) { /* cancelled */ }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      $("reportMsg").textContent = "Report copied to clipboard.";
+      toast("Copied to clipboard");
+    } catch (e) {
+      $("reportMsg").textContent = "Sharing not available on this device.";
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (!$("help").hidden) closeHelp();
+      else if (!$("report").hidden) closeReport();
+    }
+  });
+
+  syncThemeUI();
+  restoreId();
+  loadData();
+  render();
+})();
+</script>
+</body>
+</html>
