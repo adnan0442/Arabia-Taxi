@@ -26,7 +26,7 @@ try { if (localStorage.getItem("arabiaTaxi:theme") === "dark") document.document
   --line: #2B2F37; --line-soft: #23262C; --green: #1E3523; --green-ink: #9CCB99; --green-ink2: #8FB98C;
   --blue: #172A40; --orange: #3A2A1C; --sun: #3A3513; --pink: #40202A; --red: #FF8E9B; --red-soft: #F3B5BD;
   --row: #162131; --row-today: #3A3513; --row-off: #3A2A1C; --off-ink: #FFB27A; --field: #0E1014; --btn: #242932;
-  --chip: rgba(255,255,255,0.08); --hr: rgba(255,255,255,0.14); --brand: #2A7BE0; --navy: #0A2447;
+  --chip: rgba(255,255,255,0.08); --hr: rgba(255,255,255,0.14); --brand: #2A7BE0; --navy: #1B3A5C;
   --toast-bg: #F2F3F5; --toast-ink: #111827; color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -39,8 +39,8 @@ body.overlay-open { overflow: hidden; }
 button { font: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 .i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
-.field input:focus-visible, .idbox input:focus-visible { outline: 0; }
+button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within, .cf:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
+.field input:focus-visible, .idbox input:focus-visible, .cf input:focus-visible { outline: 0; }
 
 .brand { background: var(--brand-green); color: var(--on-brand-green); border-radius: 14px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 .badge { width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--brand-green-deep); display: grid; place-items: center; }
@@ -81,7 +81,6 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 .stat { min-width: 0; padding: 9px 11px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .stat .label { font-size: 11px; letter-spacing: 0; line-height: 1.2; }
 .stat .v { font: 800 clamp(18px, 5.6vw, 22px)/1.1 var(--font); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-.stat .v.txt { font-size: 18px; }
 .s-avg { background: var(--blue); }
 .s-need { background: var(--green); }
 .s-min { background: var(--orange); }
@@ -91,7 +90,17 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 .left .label { color: var(--red); }
 .left .v { font: 800 clamp(26px, 8.2vw, 34px)/1.05 var(--font); color: var(--red); margin: 2px 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .left .s { font: 500 13px/1.2 var(--font); color: var(--red-soft); }
-.left-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.left-top { display: flex; justify-content: space-between; align-items: stretch; gap: 8px; }
+.need-wrap { flex: none; min-width: 104px; display: flex; flex-direction: column; gap: 4px; }
+.pace-box { padding: 5px 8px; border-radius: 10px; background: var(--card); border: 1px solid var(--line-soft); text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.pace-box .p-lbl { display: block; font: 700 10.5px/1.15 var(--font); letter-spacing: 0.01em; }
+.pace-box .p-val { display: block; margin-top: 2px; font: 800 15px/1.15 var(--font); font-variant-numeric: tabular-nums; }
+.pace-box.is-plus { background: var(--green); border-color: rgba(68, 101, 43, 0.25); }
+.pace-box.is-plus .p-lbl, .pace-box.is-plus .p-val { color: var(--green-ink); }
+.pace-box.is-minus { background: var(--pink); border-color: rgba(166, 27, 43, 0.22); }
+.pace-box.is-minus .p-lbl, .pace-box.is-minus .p-val { color: var(--red); }
+.pace-box.is-neutral { background: var(--card); }
+.pace-box.is-neutral .p-lbl, .pace-box.is-neutral .p-val { color: var(--muted); }
 
 .days-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 16px 0 4px; }
 .days-head h3 { margin: 0; font: 700 22px/1.15 var(--font); }
@@ -102,23 +111,30 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
 
 .days { display: flex; flex-direction: column; gap: 6px; }
-.day { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 4px 6px; border-radius: 13px; background: var(--row); scroll-margin-bottom: 64px; box-shadow: 0 0 0 1px rgba(60,120,190,0.05), 0 1px 4px rgba(60,120,190,0.08); }
+.day { display: grid; grid-template-columns: 42px auto auto minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 4px 6px; border-radius: 13px; background: var(--row); scroll-margin-bottom: 64px; box-shadow: 0 0 0 1px rgba(60,120,190,0.05), 0 1px 4px rgba(60,120,190,0.08); }
 .day.is-today { background: var(--row-today); box-shadow: 0 0 0 1px rgba(200,160,0,0.1), 0 1px 4px rgba(200,160,0,0.1); }
 .day.is-off { background: var(--row-off); box-shadow: 0 0 0 1px rgba(200,110,40,0.08), 0 1px 4px rgba(200,110,40,0.08); }
 .dn { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
 .dn b { font: 800 17px var(--font); display: inline-flex; align-items: flex-start; gap: 2px; font-variant-numeric: tabular-nums; }
 .dn b .dot { margin-top: 2px; }
 .dn span { font: 500 12px var(--font); color: var(--ink-soft); margin-top: 1px; }
+.mid { min-width: 0; }
 .field { display: flex; align-items: center; gap: 6px; min-width: 0; height: 38px; padding: 0 10px; background: var(--field); border-radius: 10px; }
-.field input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); font: 700 20px var(--font); text-align: right; padding: 0; font-variant-numeric: tabular-nums; }
+.field input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); font: 700 18px var(--font); text-align: right; padding: 0; font-variant-numeric: tabular-nums; }
 .field input::placeholder { color: var(--ink-soft); opacity: 1; font-weight: 600; }
 .field .cur { font: 600 11px var(--font); letter-spacing: 0.05em; color: var(--muted); }
 .day.is-off .field input { text-align: center; color: var(--muted); font-weight: 600; }
 .day.is-off .cur { display: none; }
 .day.invalid .field { box-shadow: inset 0 0 0 2px var(--red); }
-.off-btn { min-width: 60px; height: 38px; padding: 0 8px; border: 0; border-radius: 10px; background: var(--btn); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 15px var(--font); }
-.off-btn .i { width: 16px; height: 16px; }
+.day.from-calc .field { box-shadow: inset 0 0 0 2px #E0A100; }
+.off-btn { width: 40px; min-width: 40px; height: 38px; padding: 0; border: 0; border-radius: 10px; background: var(--btn); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; gap: 3px; font: 600 13px var(--font); }
+.off-btn .i { width: 14px; height: 14px; }
 .day.is-off .off-btn { color: var(--off-ink); }
+.ib { width: 40px; min-width: 40px; height: 38px; padding: 0; border: 0; border-radius: 10px; display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.ib .i { width: 16px; height: 16px; }
+.ib.calc { background: var(--brand); color: #fff; }
+.ib.sum { background: var(--brand); color: #fff; }
+.ib:disabled { opacity: 0.35; box-shadow: none; cursor: not-allowed; }
 .foot-note { margin: 12px 6px 0; text-align: center; font: 500 13px/1.4 var(--font); color: var(--muted); }
 
 .end { margin-top: 14px; }
@@ -131,15 +147,63 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 .credit { margin-top: 8px; background: var(--navy); color: #fff; text-align: center; font: 500 12.5px var(--font); padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px)); }
 .credit b { letter-spacing: 0.03em; }
 
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 40; display: flex; align-items: center; gap: 6px; width: max-content; max-width: calc(100vw - 32px); padding: 7px 12px; border-radius: 999px; background: var(--toast-bg); color: var(--toast-ink); font: 600 13px var(--font); pointer-events: none; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 60; display: flex; align-items: center; gap: 6px; width: max-content; max-width: calc(100vw - 32px); padding: 7px 12px; border-radius: 999px; background: var(--toast-bg); color: var(--toast-ink); font: 600 13px var(--font); pointer-events: none; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
 .toast .i { width: 14px; height: 14px; }
 .toast.error { background: #A61B2B; color: #fff; }
 
 .sheet { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; background: var(--page); }
-.sheet-bar { display: flex; align-items: center; gap: 10px; background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.12); padding: calc(6px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 6px max(12px, env(safe-area-inset-left, 0px)); }
+.sheet-bar { display: flex; align-items: center; justify-content: space-between; background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.12); padding: calc(6px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 6px max(12px, env(safe-area-inset-left, 0px)); }
 .sheet-bar h2 { margin: 0; font: 700 18px var(--font); }
-.icon-btn { width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--page); color: var(--ink); display: grid; place-items: center; }
+.sheet-bar .sub { display: block; font: 500 12px var(--font); color: var(--muted); }
+.icon-btn { width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--page); color: var(--ink); display: grid; place-items: center; flex: none; }
 .sheet-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px max(12px, env(safe-area-inset-right, 0px)) 12px max(12px, env(safe-area-inset-left, 0px)); }
+
+/* CALCULATOR SHEET STYLES */
+.cf-inner { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
+.cf-group { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.cf-group h3 { margin: 0; font: 700 13.5px var(--font); color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+.cf-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
+.cf-row label { font: 700 15px var(--font); }
+.cf-row .hint { display: block; font: 500 11.5px var(--font); color: var(--muted); }
+.cf { display: flex; align-items: center; gap: 6px; width: 145px; height: 46px; padding: 0 12px; background: var(--field); border: 1.5px solid var(--line); border-radius: 12px; }
+.cf input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); font: 800 18px var(--font); text-align: right; padding: 0; font-variant-numeric: tabular-nums; }
+.cf .cur { font: 700 12px var(--font); color: var(--muted); }
+
+.cf-total { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 16px; }
+.cf-total-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font: 600 15px var(--font); }
+.cf-total-row b { font-variant-numeric: tabular-nums; font-weight: 800; text-align: right; }
+.cf-total-row:last-child { border-bottom: 0; }
+.cf-total-sum { font-weight: 800; font-size: 16px; }
+
+.cf-net { border-radius: 16px; padding: 14px; text-align: center; background: var(--green); color: var(--green-ink); }
+.cf-net .label { font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.cf-net b { display: block; font: 800 30px/1.1 var(--font); font-variant-numeric: tabular-nums; color: var(--green-ink); margin-top: 2px; }
+
+.cf-gross { border-radius: 16px; padding: 14px; text-align: center; background: var(--blue); color: var(--navy); }
+.cf-gross .label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--navy); }
+.cf-gross b { display: block; font: 800 30px/1.1 var(--font); font-variant-numeric: tabular-nums; color: var(--navy); margin-top: 2px; }
+
+:root[data-theme="dark"] .cf-gross { background: #172A40; color: #9CCB99; }
+:root[data-theme="dark"] .cf-gross .label { color: #9CCB99; }
+:root[data-theme="dark"] .cf-gross b { color: #FFFFFF; }
+
+:root[data-theme="dark"] .sum-target { background: #172A40 !important; color: #9CCB99 !important; }
+:root[data-theme="dark"] .sum-target .label { color: #9CCB99 !important; }
+:root[data-theme="dark"] .sum-target b { color: #FFFFFF !important; }
+
+.cf-note { font: 500 13px/1.4 var(--font); color: var(--muted); text-align: center; margin: 0; }
+.cf-actions { display: flex; gap: 10px; }
+.cf-actions .btn { min-height: 48px; font-size: 16px; }
+
+/* SUMMARY SHEET */
+.sum-table { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 12px; }
+.sum-table div { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); font: 500 14px var(--font); }
+.sum-table div:last-child { border-bottom: 0; }
+.sum-table div b { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+.sum-table .tot { font-weight: 800; }
+.sum-target { border-radius: 14px; padding: 12px; text-align: center; background: var(--blue); color: var(--navy); }
+.sum-target .label { font-size: 11.5px; color: var(--navy); font-weight: 700; text-transform: uppercase; }
+.sum-target b { display: block; font: 800 26px/1.1 var(--font); font-variant-numeric: tabular-nums; color: var(--navy); }
 
 .help-inner { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px; }
 .help-group { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
@@ -156,24 +220,25 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 .help-row.plain:active { background: transparent; }
 .help-note { margin: 2px 4px 0; text-align: center; font: 500 12.5px/1.4 var(--font); color: var(--muted); }
 
-.paper { max-width: 560px; margin: 0 auto; background: #FFFFFF !important; color: #111827 !important; border: 1px solid #E3E6EC; border-radius: 14px; overflow: hidden; }
-.paper-head { background: #1B5E20 !important; color: #FFFFFF !important; padding: 10px 14px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.paper-head h3 { margin: 0; font: 800 18px/1.2 var(--font); color: #FFFFFF !important; }
-.paper-head p { margin: 2px 0 0; font: 500 13px var(--font); opacity: 0.9; color: #FFFFFF !important; }
-.paper-body { padding: 12px 14px 14px; background: #FFFFFF !important; color: #111827 !important; }
-.meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 12px; }
-.meta div, .sum div { min-width: 0; }
-.meta dt, .sum dt { font: 600 11.5px var(--font); text-transform: uppercase; letter-spacing: 0.04em; color: #6B7280 !important; }
-.meta dd, .sum dd { margin: 2px 0 0; font: 700 16px var(--font); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; color: #111827 !important; }
-.sum { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin: 0 0 14px; padding: 10px 0; border-block: 1px solid #E3E6EC; }
+/* SINGLE-PAGE COMPACT MONTHLY REPORT */
+.paper { max-width: 760px; margin: 0 auto; background: #FFFFFF !important; color: #111827 !important; border: 1px solid #E3E6EC; border-radius: 12px; overflow: hidden; }
+.paper-head { background: #1B5E20 !important; color: #FFFFFF !important; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.paper-head h3 { margin: 0; font: 800 14px/1.15 var(--font); color: #FFFFFF !important; }
+.paper-head p { margin: 0; font: 500 11px/1.15 var(--font); opacity: 0.92; color: #FFFFFF !important; text-align: right; }
+.paper-body { padding: 8px 12px 10px; background: #FFFFFF !important; color: #111827 !important; }
+.meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0 0 6px; }
+.meta dt, .sum dt { font: 600 9.5px/1.1 var(--font); text-transform: uppercase; letter-spacing: 0.03em; color: #6B7280 !important; }
+.meta dd, .sum dd { margin: 1px 0 0; font: 700 12px/1.15 var(--font); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; color: #111827 !important; }
+.sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; margin: 0 0 8px; padding: 6px 0; border-block: 1px solid #E3E6EC; }
 .tbl-wrap { overflow-x: auto; }
-.paper table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.paper th { text-align: left; font: 600 11.5px var(--font); text-transform: uppercase; letter-spacing: 0.04em; color: #6B7280 !important; padding: 5px 0; border-bottom: 1px solid #E3E6EC; }
-.paper td { padding: 6px 0; font: 500 15px var(--font); border-bottom: 1px solid #EEF0F4; color: #111827 !important; }
+.paper table { width: 100% !important; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.paper th { text-align: left; font: 600 9.5px/1.1 var(--font); text-transform: uppercase; letter-spacing: 0.03em; color: #6B7280 !important; padding: 2px 4px; border-bottom: 1px solid #E3E6EC; }
+.paper td { padding: 1.5px 4px; font: 500 10.5px/1.15 var(--font); border-bottom: 1px solid #EEF0F4; color: #111827 !important; }
 .paper .num { text-align: right; }
 .paper td.dim { color: #9CA3AF !important; }
-.paper tfoot td { font-weight: 800; border-bottom: 0; padding-top: 8px; color: #111827 !important; }
-.gen { margin: 10px 0 0; font: 500 12px var(--font); color: #6B7280 !important; }
+.paper tfoot td { font-weight: 800; border-bottom: 0; padding-top: 4px; font-size: 11px; color: #111827 !important; }
+.gen { margin: 5px 0 0; font: 500 9.5px/1.1 var(--font); color: #6B7280 !important; text-align: right; }
+
 .report-actions { background: var(--card); box-shadow: 0 -4px 14px rgba(0,0,0,0.12); padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
 .report-actions > * { max-width: 560px; margin-inline: auto; }
 .msg { min-height: 18px; margin-bottom: 6px; text-align: center; font: 500 13px var(--font); color: var(--ink-soft); }
@@ -181,69 +246,30 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-size: 16px; min-height: 46px; }
 .btn + .btn { margin-top: 8px; }
 
-/* ===== PRINT FIX ===== */
 @media print {
-  @page { margin: 10mm; size: A4; }
-
-  html, body {
-    background: #fff !important;
-    overflow: visible !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
+  @page { margin: 4mm; size: A4 portrait; }
+  html, body { background: #fff !important; overflow: visible !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
   body::before { display: none !important; }
-
-  #app,
-  .toast,
-  #help,
-  .sheet-bar,
-  .report-actions,
-  .msg { display: none !important; }
-
-  #report {
-    display: block !important;
-    position: static !important;
-    inset: auto !important;
-    background: #fff !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    z-index: auto !important;
-  }
+  #app, .toast, #help, #calc, #calcSummary, .sheet-bar, .report-actions, .msg { display: none !important; }
+  #report { display: block !important; position: static !important; inset: auto !important; background: #fff !important; height: auto !important; min-height: 0 !important; overflow: visible !important; z-index: auto !important; }
   #report[hidden] { display: block !important; }
-
-  #reportScroll {
-    display: block !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    height: auto !important;
-    max-height: none !important;
-  }
-
-  .paper {
-    background: #fff !important;
-    color: #111827 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    max-width: none !important;
-    width: 100% !important;
-    box-shadow: none !important;
-    overflow: visible !important;
-  }
-
-  .paper-head {
-    background: #1B5E20 !important;
-    color: #fff !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  .paper-body { background: #fff !important; color: #111827 !important; }
+  #reportScroll { display: block !important; overflow: visible !important; padding: 0 !important; height: auto !important; max-height: none !important; }
+  .paper { background: #fff !important; color: #111827 !important; border: 0 !important; border-radius: 0 !important; max-width: none !important; width: 100% !important; box-shadow: none !important; overflow: visible !important; }
+  .paper-head { background: #1B5E20 !important; color: #fff !important; padding: 5px 10px !important; }
+  .paper-body { background: #fff !important; color: #111827 !important; padding: 5px 10px !important; }
+  .sum { gap: 3px 8px !important; margin: 0 0 5px !important; padding: 4px 0 !important; }
+  .paper th, .paper td { padding: 1px 4px !important; font-size: 9.5px !important; line-height: 1.1 !important; }
   .tbl-wrap { overflow: visible !important; }
   .paper table { width: 100% !important; }
   .paper tr { page-break-inside: avoid; }
 }
+.day { display: flex !important; align-items: center; gap: 6px; }
+.dn { flex: none; width: 42px; }
+.acts { display: flex !important; align-items: center; gap: 4px; flex: none; }
+.acts .ib, .off-btn { flex: none; align-self: center; margin: 0; height: 38px; }
+.mid { flex: 1 1 0; min-width: 0; }
+.ib { display: flex !important; align-items: center; justify-content: center; padding: 0; }
+.ib .i { display: block; flex: none; margin: 0; width: 18px; height: 18px; }
 </style>
 </head>
 <body>
@@ -268,7 +294,8 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h2.8l1.4 4.1-1.9 1.3a11 11 0 0 0 5.2 5.2l1.3-1.9 4.1 1.4v2.8a2 2 0 0 1-2.2 2A16 16 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
-    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></symbol>
+    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 15.5v-3M12 15.5V9M15 15.5v-5"/></symbol>
   </defs>
 </svg>
 
@@ -282,7 +309,7 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
       </div>
       <div class="brand-foot">
         <button class="help-btn" id="helpBtn" type="button" aria-label="Open help and contacts"><svg class="i"><use href="#i-help"/></svg><span>Help</span></button>
-        <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch to black theme"><svg class="i"><use href="#i-moon"/></svg><span>Black</span></button>
+        <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch theme"><svg class="i"><use href="#i-moon"/></svg><span>Black</span></button>
       </div>
     </header>
 
@@ -324,9 +351,15 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
           <div class="v" id="leftTarget">AED 0.00</div>
           <div class="s" id="leftSub">Remaining to monthly target</div>
         </div>
-        <div class="stat s-need" style="flex: none; min-width: 90px; padding: 6px 8px; border-radius: 12px; box-shadow: none; text-align: center;">
-          <div class="label" style="font-size: 11px;">Needed / Day</div>
-          <div class="v" id="perDay" style="font-size: 19px; line-height: 1.1;">—</div>
+        <div class="need-wrap">
+          <div class="stat s-need" style="flex: none; min-width: 90px; padding: 6px 8px; border-radius: 12px; box-shadow: none; text-align: center;">
+            <div class="label" style="font-size: 11px;">Needed / Day</div>
+            <div class="v" id="perDay" style="font-size: 19px; line-height: 1.1;">—</div>
+          </div>
+          <div class="pace-box is-neutral" id="targetPaceBox" aria-label="Target comparison">
+            <span class="p-lbl" id="paceLabel">Target</span>
+            <span class="p-val" id="paceVal">—</span>
+          </div>
         </div>
       </div>
     </section>
@@ -337,7 +370,7 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     </div>
     <div class="legend">
       <span class="today-key" id="todayKey"><i class="dot"></i>Today</span>
-      <span>Tap to edit · Off to skip · Undo to restore</span>
+      <span>Tap to edit · Off to skip · Calc per day</span>
     </div>
     <div class="days" id="days"></div>
     <p class="foot-note" id="footNote"></p>
@@ -357,6 +390,131 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- CALCULATOR SHEET -->
+<div class="sheet" id="calc" role="dialog" aria-modal="true" aria-labelledby="calcTitle" hidden>
+  <div class="sheet-bar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button class="icon-btn" id="calcClose" type="button" aria-label="Close calculator"><svg class="i"><use href="#i-close"/></svg></button>
+      <div>
+        <h2 id="calcTitle">Daily Calculator</h2>
+        <span class="sub" id="calcSub"></span>
+      </div>
+    </div>
+    <div>
+      <button class="help-btn" id="toggleCalcModeBtn" type="button" style="background:var(--brand); color:#fff; padding:6px 12px; border-radius:10px; font-weight:700; font-size:12px;">Step-by-Step</button>
+    </div>
+  </div>
+  <div class="sheet-scroll">
+    <div class="cf-inner">
+
+      <!-- WIZARD SECTION -->
+      <div id="wizardSection" class="cf-group" style="display:none; border:2px solid var(--brand);">
+        <div style="margin-bottom:4px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--brand); margin-bottom:4px;">
+            <span id="wizardStepLabel">Question 1 of 9</span>
+            <span id="wizardProgressPercent">11%</span>
+          </div>
+          <div style="width:100%; background:var(--line); height:6px; border-radius:999px; overflow:hidden;">
+            <div id="wizardProgressBar" style="background:var(--brand); height:100%; width:11%; transition:width 0.3s;"></div>
+          </div>
+        </div>
+        <div style="padding:10px 0; text-align:center;">
+          <h3 id="wizardQuestionMain" style="margin:0 0 4px; font-size:18px; font-weight:800;"></h3>
+          <p id="wizardQuestionSub" style="margin:0 0 12px; font-size:12.5px; color:var(--muted);"></p>
+          <div style="max-width:240px; margin:0 auto;">
+            <form id="wizardForm" onsubmit="event.preventDefault(); nextWizardStep();">
+              <input type="number" id="wizardInput" step="any" inputmode="decimal" style="width:100%; text-align:center; font-size:26px; font-weight:800; background:var(--field); border:2px solid var(--brand); border-radius:12px; padding:10px; color:var(--ink); outline:none;" oninput="syncFromWizard()">
+            </form>
+            <div id="wizardLiveHint" style="font-size:12px; color:var(--brand); margin-top:6px; font-weight:600; min-height:16px;"></div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; gap:8px; padding-top:8px; border-top:1px solid var(--line);">
+          <button type="button" id="wizardPrevBtn" onclick="prevWizardStep()" class="btn" style="flex:1;">← Previous</button>
+          <button type="button" id="wizardNextBtn" onclick="nextWizardStep()" class="btn primary" style="flex:1;">Next →</button>
+        </div>
+      </div>
+
+      <!-- FULL FORM SECTION -->
+      <div id="fullFormSection" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="cf-group">
+          <h3>Expenses &amp; Deductions</h3>
+          <div class="cf-row"><label for="cSalik">Salik Toll</label><div class="cf"><input id="cSalik" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+          <div class="cf-row"><label for="cHala">Hala Peak</label><div class="cf"><input id="cHala" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+          <div class="cf-row"><label for="cTip">Card Tip</label><div class="cf"><input id="cTip" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+        </div>
+        
+        <div class="cf-group">
+          <h3>Earnings &amp; Income</h3>
+          <div class="cf-row"><label for="cCash">Total Income / Cash</label><div class="cf"><input id="cCash" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+          <div class="cf-row"><label for="cTrips">Total Trips<span class="hint">× 2 auto</span></label><div class="cf"><input id="cTrips" type="number" inputmode="numeric" step="1" data-calc="1"><span class="cur">TRIPS</span></div></div>
+          <div class="cf-row"><label for="cBook">Total Booking Charges</label><div class="cf"><input id="cBook" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+          <div class="cf-row"><label for="cKm">Kilometers<span class="hint" id="cKmHint">× fuel rate 0.91</span></label><div class="cf"><input id="cKm" type="number" inputmode="decimal" step="0.1" data-calc="1"><span class="cur">KM</span></div></div>
+          <div class="cf-row"><label for="cCareem">Paid in Careem</label><div class="cf"><input id="cCareem" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+          <div class="cf-row"><label for="cDiscount">Careem Discount</label><div class="cf"><input id="cDiscount" type="number" inputmode="decimal" step="0.01" data-calc="1"><span class="cur">AED</span></div></div>
+        </div>
+      </div>
+      
+      <div class="cf-total">
+        <div class="cf-total-row"><span>Total Income (Cash)</span><b id="rCash">0.00 AED</b></div>
+        <div class="cf-total-row"><span>Paid in Careem</span><b id="rCareem">0.00 AED</b></div>
+        <div class="cf-total-row"><span>Careem Discount</span><b id="rDiscount">0.00 AED</b></div>
+        <div class="cf-total-row cf-total-sum"><span>Total Income</span><b id="rGross">0.00 AED</b></div>
+      </div>
+      
+      <div class="cf-gross">
+        <span class="label">Gross Income</span>
+        <b id="rGrossBox">0.00 AED</b>
+      </div>
+      <div class="cf-net">
+        <span class="label">Clean Income (Net)</span>
+        <b id="rNet">0.00 AED</b>
+      </div>
+
+      <p class="cf-note" id="calcNote">Clean income (net) is added to this day's target automatically.</p>
+      
+      <div class="cf-actions">
+        <button class="btn" id="calcClear" type="button">Clear</button>
+        <button class="btn primary" id="calcDone" type="button">Done</button>
+      </div>
+
+      <div class="cf-group" style="margin-top: 6px; border: 1px solid var(--brand);">
+        <div class="cf-row">
+          <label for="cFuel">Fuel Rate (Global)<span class="hint">AED per KM (applies all month)</span></label>
+          <div class="cf"><input id="cFuel" type="number" inputmode="decimal" step="0.01"><span class="cur">AED</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATOR SUMMARY SHEET -->
+<div class="sheet" id="calcSummary" role="dialog" aria-modal="true" aria-labelledby="calcSumTitle" hidden>
+  <div class="sheet-bar">
+    <button class="icon-btn" id="calcSumClose" type="button" aria-label="Close summary"><svg class="i"><use href="#i-close"/></svg></button>
+    <h2 id="calcSumTitle">Day Summary<span class="sub" id="calcSumSub"></span></h2>
+  </div>
+  <div class="sheet-scroll">
+    <div class="cf-inner">
+      <div class="sum-table" id="calcSumTable"></div>
+      
+      <div class="sum-target">
+        <span class="label">Gross Income</span>
+        <b id="sGross">0.00 AED</b>
+      </div>
+      <div class="sum-target" style="background: var(--green); color: var(--green-ink);">
+        <span class="label" style="color: var(--green-ink);">Clean Income (added to target)</span>
+        <b id="sTarget" style="color: var(--green-ink);">0.00 AED</b>
+      </div>
+
+      <div class="cf-actions">
+        <button class="btn" id="calcSumEdit" type="button">Edit Calculator</button>
+        <button class="btn primary" id="calcSumCopy" type="button"><svg class="i"><use href="#i-share"/></svg>Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="sheet" id="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
   <div class="sheet-bar">
@@ -395,6 +553,9 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
   var DEFAULT_DRIVER_ID = "3008703";
   var ID_KEY = "arabiaTaxi:driverId";
   var THEME_KEY = "arabiaTaxi:theme";
+  var CALC_KEY = "arabiaTaxi:calc:";
+  var FUEL_KEY = "arabiaTaxi:fuelRate";
+  var DEFAULT_FUEL = 0.91;
 
   var CONTACTS = [
     { group: "Email", items: [
@@ -403,6 +564,7 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
       { label: "Fleet Email", value: "fleet.dxb@arabiataxi.ae", kind: "mail" }
     ]},
     { group: "Phone numbers", items: [
+      { label: "Reception", value: "+971 42855566", kind: "tel" },
       { label: "Meter Room", value: "04 223 1758", kind: "tel" },
       { label: "HR", value: "052 609 7125", kind: "tel" },
       { label: "Accident Report", value: "054 792 0022", kind: "tel" },
@@ -436,6 +598,24 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
   var saveTimer = null;
   var toastTimer = null;
   var opener = null;
+  var calcCtx = null;
+  var sumCtx = null;
+  var lastActiveValues = {};
+  var lastCalcValues = {};
+  var isWizardMode = false;
+  var currentStep = 0;
+
+  var wizardSteps = [
+    { id: 'cSalik', main: 'Salik Toll Charges?' },
+    { id: 'cHala', main: 'Hala Peak Amount?' },
+    { id: 'cTip', main: 'Card Tip Amount?' },
+    { id: 'cCash', main: 'Total Cash / Meter Income?' },
+    { id: 'cTrips', main: 'Total Trips completed?' },
+    { id: 'cBook', main: 'Total Booking Charges?' },
+    { id: 'cKm', main: 'Total Kilometers (KM)?' },
+    { id: 'cCareem', main: 'Paid in Careem?' },
+    { id: 'cDiscount', main: 'Careem Discount Amount?' }
+  ];
 
   var $ = function (id) { return document.getElementById(id); };
   var pad = function (n) { return String(n).padStart(2, "0"); };
@@ -448,17 +628,19 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     });
   };
   var daysIn = function () { return new Date(view.y, view.m + 1, 0).getDate(); };
-  var storageKey = function () { return "arabiaTaxi:" + view.y + "-" + pad(view.m + 1); };
+  var monthKeyOf = function (y, m) { return "arabiaTaxi:" + y + "-" + pad(m + 1); };
+  var storageKey = function () { return monthKeyOf(view.y, view.m); };
+  var dayKey = function (y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); };
   var monthName = function () { return new Date(view.y, view.m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
   var weekday = function (d) { return new Date(view.y, view.m, d).toLocaleDateString("en-US", { weekday: "short" }); };
   var driverId = function () { return $("driverId").value.trim() || DEFAULT_DRIVER_ID; };
   var icon = function (name) { return '<svg class="i"><use href="#i-' + name + '"/></svg>'; };
+  var longDate = function (y, m, d) { return new Date(y, m, d).toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short", year: "numeric" }); };
 
   function isDark() { return document.documentElement.getAttribute("data-theme") === "dark"; }
   function syncThemeUI() {
     var dark = isDark();
     $("themeBtn").innerHTML = icon(dark ? "sun" : "moon") + "<span>" + (dark ? "Light" : "Black") + "</span>";
-    $("themeBtn").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to black theme");
     $("metaTheme").setAttribute("content", dark ? "#0B0C0F" : "#1B5E20");
   }
   $("themeBtn").addEventListener("click", function () {
@@ -525,6 +707,16 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     saveData();
   }
 
+  function writeDay(y, m, d, amount, fromCalc) {
+    var key = monthKeyOf(y, m);
+    var obj = {};
+    try { obj = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { obj = {}; }
+    if (amount > 0) obj[d] = amount; else delete obj[d];
+    if (fromCalc) obj["calc" + d] = true; else delete obj["calc" + d];
+    try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
+    if (y === view.y && m === view.m) { loadData(); render(); }
+  }
+
   function computeStats() {
     var total = 0, worked = 0, off = 0, days = daysIn(), lows = [], highs = [];
     var today = new Date();
@@ -550,10 +742,13 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
         if (avg >= TIERS[i][0]) { pct = TIERS[i][1]; break; }
       }
     }
+    var expectedToDate = TARGET * worked;
+    var paceDiff = total - expectedToDate;
     return {
       total: total, worked: worked, off: off, days: days, daysLeft: daysLeft,
       target: target, left: left, perDay: perDay, avg: avg, min: min, max: max,
-      pct: pct, isCurrentMonth: isCurrentMonth, lows: lows, highs: highs
+      pct: pct, isCurrentMonth: isCurrentMonth, lows: lows, highs: highs,
+      expectedToDate: expectedToDate, paceDiff: paceDiff
     };
   }
 
@@ -571,8 +766,24 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     $("avg").textContent = s.worked ? fmt(s.avg) : "—";
     $("min").textContent = s.worked ? fmt(s.min) : "—";
     $("max").textContent = s.worked ? fmt(s.max) : "—";
-    var todayKey = $("todayKey");
-    todayKey.setAttribute("data-off", s.isCurrentMonth ? "false" : "true");
+    var paceBox = $("targetPaceBox");
+    var paceLabel = $("paceLabel");
+    var paceVal = $("paceVal");
+    paceBox.classList.remove("is-plus", "is-minus", "is-neutral");
+    if (!s.worked) {
+      paceBox.classList.add("is-neutral");
+      paceLabel.textContent = "Target";
+      paceVal.textContent = "—";
+    } else if (s.paceDiff >= 0) {
+      paceBox.classList.add("is-plus");
+      paceLabel.textContent = "More than Income";
+      paceVal.textContent = "+" + fmt(s.paceDiff);
+    } else {
+      paceBox.classList.add("is-minus");
+      paceLabel.textContent = "Low Income";
+      paceVal.textContent = "-" + fmt(Math.abs(s.paceDiff));
+    }
+    $("todayKey").setAttribute("data-off", s.isCurrentMonth ? "false" : "true");
     $("footNote").textContent = s.worked ? plural(s.worked, "day recorded", "days recorded") + " · " + plural(s.off, "off day", "off days") : "Start entering daily income to see statistics.";
   }
 
@@ -587,15 +798,22 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
       var v = getVal(d);
       var isToday = isCurrent && d === todayDate;
       var isOff = v === "off";
-      var val = isOff ? "" : (v > 0 ? v : "");
-      var cls = "day" + (isToday ? " is-today" : "") + (isOff ? " is-off" : "");
+      var calc = loadCalc(dayKey(view.y, view.m, d));
+      var val = (!isOff && v > 0) ? v : "";
+      var cls = "day" + (isToday ? " is-today" : "") + (isOff ? " is-off" : "") + (calc ? " from-calc" : "");
       html += '<div class="' + cls + '" data-day="' + d + '">' +
         '<div class="dn"><b>' + d + (isToday ? '<i class="dot"></i>' : "") + '</b><span>' + weekday(d) + '</span></div>' +
-        '<label class="field">' +
-          '<input type="text" inputmode="decimal" data-day="' + d + '" placeholder="' + (isOff ? "Off" : "0.00") + '" value="' + (val === "" ? "" : esc(String(val))) + '"' + (isOff ? " readonly" : "") + '>' +
-          '<span class="cur">AED</span>' +
-        '</label>' +
-        '<button class="off-btn" type="button" data-day="' + d + '">' + (isOff ? icon("undo") + "Undo" : icon("ban") + "Off") + '</button>' +
+        '<div class="acts">' +
+          '<button class="ib calc" type="button" data-calc-day="' + d + '" aria-label="Calculator for day ' + d + '"' + (isOff ? " disabled" : "") + '>' + icon("calc") + '</button>' +
+          '<button class="ib sum" type="button" data-sum-day="' + d + '" aria-label="Summary for day ' + d + '"' + (calc ? "" : ' style="visibility:hidden"') + '>' + icon("receipt") + '</button>' +
+        '</div>' +
+        '<div class="mid">' +
+          '<label class="field">' +
+            '<input type="text" inputmode="decimal" data-day="' + d + '" placeholder="' + (isOff ? "Off" : "0.00") + '" value="' + esc(String(val)) + '"' + (isOff ? " readonly" : "") + '>' +
+            '<span class="cur">AED</span>' +
+          '</label>' +
+        '</div>' +
+        '<button class="off-btn" type="button" data-off-day="' + d + '">' + (isOff ? icon("undo") + "Undo" : icon("ban") + "Off") + '</button>' +
       '</div>';
     }
     wrap.innerHTML = html;
@@ -624,6 +842,8 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     var inp = e.target.closest("input[data-day]");
     if (!inp) return;
     var d = Number(inp.getAttribute("data-day"));
+    var k = dayKey(view.y, view.m, d);
+    var hadCalc = !!loadCalc(k);
     var raw = inp.value.replace(/[^0-9.]/g, "");
     var parts = raw.split(".");
     if (parts.length > 2) raw = parts[0] + "." + parts.slice(1).join("");
@@ -633,27 +853,49 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     if (raw === "") { setVal(d, 0); }
     else if (!isFinite(n) || n < 0) { inp.closest(".day").classList.add("invalid"); return; }
     else { setVal(d, n); }
+    if (hadCalc) {
+      try { localStorage.removeItem(CALC_KEY + k); } catch (err) {}
+      renderDays();
+    }
     renderHero();
   });
 
-  $("days").addEventListener("blur", function (e) {
-    var inp = e.target.closest("input[data-day]");
-    if (!inp) return;
-    var d = Number(inp.getAttribute("data-day"));
-    var n = parseFloat(inp.value);
-    if (isFinite(n) && n > 0) inp.value = fmt(n);
-    else inp.value = "";
-  }, true);
-
   $("days").addEventListener("click", function (e) {
-    var btn = e.target.closest("button.off-btn");
-    if (!btn) return;
-    var d = Number(btn.getAttribute("data-day"));
-    var v = getVal(d);
-    if (v === "off") setVal(d, 0);
-    else setVal(d, "off");
-    renderHero();
-    renderDays();
+    var offBtn = e.target.closest("button[data-off-day]");
+    if (offBtn) {
+      var d = Number(offBtn.getAttribute("data-off-day"));
+      var v = getVal(d);
+      var dk = dayKey(view.y, view.m, d);
+      if (v === "off") {
+        var restored = lastActiveValues[dk] !== undefined ? lastActiveValues[dk] : 0;
+        setVal(d, restored);
+        if (lastCalcValues[dk]) {
+          try { localStorage.setItem(CALC_KEY + dk, JSON.stringify(lastCalcValues[dk])); } catch (err) {}
+          delete lastCalcValues[dk];
+        }
+        toast("Off removed, previous value & summary restored");
+      } else {
+        lastActiveValues[dk] = v;
+        var existingCalc = loadCalc(dk);
+        if (existingCalc) {
+          lastCalcValues[dk] = existingCalc;
+          try { localStorage.removeItem(CALC_KEY + dk); } catch (err) {}
+        }
+        setVal(d, "off");
+        toast("Marked as Off");
+      }
+      renderHero();
+      renderDays();
+      return;
+    }
+    var calcBtn = e.target.closest("button[data-calc-day]");
+    if (calcBtn) { openCalc(Number(calcBtn.getAttribute("data-calc-day"))); return; }
+    var sumBtn = e.target.closest("button[data-sum-day]");
+    if (sumBtn) {
+      var sd = Number(sumBtn.getAttribute("data-sum-day"));
+      if (loadCalc(dayKey(view.y, view.m, sd))) openCalcSummary(sd);
+      else toast("Please calculate using Calculator first", "error");
+    }
   });
 
   $("driverId").addEventListener("input", function () {
@@ -667,6 +909,268 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     } catch (e) {}
   }
 
+  /* CALCULATOR LOGIC & WIZARD */
+  function loadCalc(k) {
+    try { return JSON.parse(localStorage.getItem(CALC_KEY + k)); } catch (e) { return null; }
+  }
+
+  function getFuel() {
+    try {
+      var s = localStorage.getItem(FUEL_KEY);
+      if (s !== null && isFinite(parseFloat(s))) return parseFloat(s);
+    } catch (e) {}
+    return DEFAULT_FUEL;
+  }
+
+  function readCalcInputs() {
+    var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+    var fuel = parseFloat($("cFuel").value);
+    return {
+      salik: num("cSalik"), hala: num("cHala"), tip: num("cTip"),
+      cash: num("cCash"), careem: num("cCareem"), discount: num("cDiscount"),
+      trips: num("cTrips"), book: num("cBook"), km: num("cKm"),
+      fuel: isFinite(fuel) ? fuel : getFuel()
+    };
+  }
+
+  function computeCalc(i) {
+    var fuelCost = i.km * i.fuel;
+    var tripsFee = i.trips * 2;
+    var ded = fuelCost + tripsFee + i.salik + i.book + i.hala + i.tip;
+    var gross = i.cash + i.careem + i.discount;
+    return {
+      fuelCost: +fuelCost.toFixed(2), tripsFee: +tripsFee.toFixed(2),
+      ded: +ded.toFixed(2), gross: +gross.toFixed(2), net: +(gross - ded).toFixed(2)
+    };
+  }
+
+  function fillCalcInputs(saved) {
+    var set = function (id, v) { $(id).value = (v === undefined || v === 0) ? "" : v; };
+    var ids = ["cSalik", "cHala", "cTip", "cCash", "cCareem", "cDiscount", "cTrips", "cBook", "cKm"];
+    if (!saved || !saved.inputs) { ids.forEach(function (id) { $(id).value = ""; }); }
+    else {
+      var x = saved.inputs;
+      set("cSalik", x.salik); set("cHala", x.hala); set("cTip", x.tip);
+      set("cCash", x.cash); set("cCareem", x.careem); set("cDiscount", x.discount);
+      set("cTrips", x.trips); set("cBook", x.book); set("cKm", x.km);
+    }
+    $("cFuel").value = getFuel().toFixed(2);
+  }
+
+  function refreshCalcOutput() {
+    var i = readCalcInputs();
+    var r = computeCalc(i);
+    $("rCash").textContent = aed(i.cash);
+    $("rCareem").textContent = aed(i.careem);
+    $("rDiscount").textContent = aed(i.discount);
+    $("rGross").textContent = aed(r.gross);
+    $("rGrossBox").textContent = aed(r.gross);
+    $("rNet").textContent = aed(r.net);
+    $("cKmHint").textContent = "× fuel rate " + i.fuel.toFixed(2);
+    if (isWizardMode) updateWizardHint();
+  }
+
+  function applyCalc() {
+    if (!calcCtx) return;
+    var c = calcCtx;
+    var k = dayKey(c.y, c.m, c.d);
+    var i = readCalcInputs();
+    var r = computeCalc(i);
+    var empty = r.gross === 0 && r.ded === 0;
+    if (empty) {
+      try { localStorage.removeItem(CALC_KEY + k); } catch (e) {}
+      writeDay(c.y, c.m, c.d, 0, false);
+    } else {
+      var entry = { inputs: i, result: r, updated: new Date().toISOString() };
+      try { localStorage.setItem(CALC_KEY + k, JSON.stringify(entry)); } catch (e) {}
+      writeDay(c.y, c.m, c.d, Math.max(0, r.net), true);
+    }
+    refreshCalcOutput();
+  }
+
+  function toggleCalcMode() {
+    isWizardMode = !isWizardMode;
+    $("toggleCalcModeBtn").textContent = isWizardMode ? "Full Form" : "Step-by-Step";
+    $("wizardSection").style.display = isWizardMode ? "block" : "none";
+    $("fullFormSection").style.display = isWizardMode ? "none" : "flex";
+    if (isWizardMode) { currentStep = 0; renderWizardStep(); }
+  }
+
+  function renderWizardStep() {
+    var step = wizardSteps[currentStep];
+    var total = wizardSteps.length;
+    var percent = Math.round(((currentStep + 1) / total) * 100);
+    $("wizardStepLabel").textContent = "Question " + (currentStep + 1) + " / " + total;
+    $("wizardProgressPercent").textContent = percent + "%";
+    $("wizardProgressBar").style.width = percent + "%";
+    $("wizardQuestionMain").textContent = step.main;
+    var wizInput = $("wizardInput");
+    wizInput.value = $(step.id).value;
+    $("wizardPrevBtn").disabled = currentStep === 0;
+    updateWizardHint();
+    setTimeout(function() { wizInput.focus(); }, 50);
+  }
+
+  function syncFromWizard() {
+    var step = wizardSteps[currentStep];
+    $(step.id).value = $("wizardInput").value;
+    refreshCalcOutput();
+    applyCalc();
+  }
+
+  function updateWizardHint() {
+    var step = wizardSteps[currentStep];
+    var val = parseFloat($("wizardInput").value) || 0;
+    var hint = $("wizardLiveHint");
+    if (step.id === 'cKm') hint.textContent = val + " KM × " + readCalcInputs().fuel.toFixed(2) + " = " + (val * readCalcInputs().fuel).toFixed(2) + " AED";
+    else if (step.id === 'cTrips') hint.textContent = val + " Trips × 2 = " + (val * 2).toFixed(2) + " AED";
+    else hint.textContent = val > 0 ? val.toFixed(2) + " AED" : "";
+  }
+
+  window.nextWizardStep = function() {
+    syncFromWizard();
+    if (currentStep < wizardSteps.length - 1) {
+      currentStep++;
+      renderWizardStep();
+    } else {
+      applyCalc();
+      var activeDay = calcCtx ? calcCtx.d : null;
+      toggleCalcMode();
+      closeCalc();
+      if (activeDay) {
+        openCalcSummary(activeDay);
+      }
+      toast("Calculation saved! Summary opened.");
+    }
+  };
+
+  window.prevWizardStep = function() {
+    syncFromWizard();
+    if (currentStep > 0) { currentStep--; renderWizardStep(); }
+  };
+
+  $("toggleCalcModeBtn").addEventListener("click", toggleCalcMode);
+
+  function openCalc(d) {
+    opener = document.activeElement;
+    calcCtx = { y: view.y, m: view.m, d: d };
+    var k = dayKey(view.y, view.m, d);
+    $("calcSub").textContent = longDate(view.y, view.m, d);
+    isWizardMode = false;
+    $("toggleCalcModeBtn").textContent = "Step-by-Step";
+    $("wizardSection").style.display = "none";
+    $("fullFormSection").style.display = "flex";
+    fillCalcInputs(loadCalc(k));
+    refreshCalcOutput();
+    $("calc").hidden = false;
+    document.body.classList.add("overlay-open");
+    $("calcClose").focus();
+  }
+
+  function closeCalc() {
+    $("calc").hidden = true;
+    calcCtx = null;
+    if (!$("calcSummary").hidden) return;
+    document.body.classList.remove("overlay-open");
+    if (opener && opener.focus) opener.focus();
+  }
+
+  function openCalcSummary(d) {
+    opener = document.activeElement;
+    sumCtx = { y: view.y, m: view.m, d: d };
+    var c = loadCalc(dayKey(view.y, view.m, d));
+    if (!c) return;
+    var r = c.result, i = c.inputs;
+    var discountVal = i.discount || 0;
+    var rows = [
+      ["Salik Toll", fmt(i.salik)],
+      ["Hala Peak", fmt(i.hala)],
+      ["Card Tip", fmt(i.tip)],
+      ["Total Income / Cash", fmt(i.cash)],
+      ["Trips", fmt(i.trips) + " × 2 = " + fmt(r.tripsFee)],
+      ["Total Booking Charges", fmt(i.book)],
+      ["Kilometers", fmt(i.km) + " × " + i.fuel.toFixed(2) + " = " + fmt(r.fuelCost)],
+      ["Paid in Careem", fmt(i.careem)],
+      ["Careem Discount", fmt(discountVal)],
+      ["Total Deductions", fmt(r.ded), "tot"],
+      ["Gross (Cash + Careem + Discount)", fmt(r.gross)],
+      ["Clean Income (added to target)", fmt(r.net), "tot"]
+    ];
+    $("calcSumSub").textContent = longDate(view.y, view.m, d);
+    $("calcSumTable").innerHTML = rows.map(function (row) {
+      return '<div class="' + (row[2] || "") + '"><span>' + esc(row[0]) + '</span><b>' + esc(row[1]) + '</b></div>';
+    }).join("");
+    $("sGross").textContent = aed(r.gross);
+    $("sTarget").textContent = aed(Math.max(0, r.net));
+    $("calcSummary").hidden = false;
+    document.body.classList.add("overlay-open");
+    $("calcSumClose").focus();
+  }
+
+  function closeCalcSummary() {
+    $("calcSummary").hidden = true;
+    sumCtx = null;
+    if (!$("calc").hidden) return;
+    document.body.classList.remove("overlay-open");
+    if (opener && opener.focus) opener.focus();
+  }
+
+  $("calcClose").addEventListener("click", function() {
+    applyCalc();
+    closeCalc();
+  });
+  
+  $("calcDone").addEventListener("click", function () {
+    applyCalc();
+    var k = calcCtx ? dayKey(calcCtx.y, calcCtx.m, calcCtx.d) : null;
+    closeCalc();
+    toast(k && loadCalc(k) ? "Saved and added to day's target" : "Cleared");
+  });
+  
+  $("calcClear").addEventListener("click", function() {
+    ["cSalik", "cHala", "cTip", "cCash", "cTrips", "cBook", "cKm", "cCareem", "cDiscount"].forEach(function (id) { $(id).value = ""; });
+    applyCalc();
+    toast("Calculator cleared");
+  });
+
+  $("calcSumClose").addEventListener("click", closeCalcSummary);
+  $("calcSumEdit").addEventListener("click", function () {
+    var d = sumCtx ? sumCtx.d : null;
+    closeCalcSummary();
+    if (d) openCalc(d);
+  });
+  $("calcSumCopy").addEventListener("click", async function () {
+    if (!sumCtx) return;
+    var c = loadCalc(dayKey(sumCtx.y, sumCtx.m, sumCtx.d));
+    if (!c) return;
+    var r = c.result, i = c.inputs;
+    var discountVal = i.discount || 0;
+    var text = "🚖 Daily Taxi Account (" + longDate(sumCtx.y, sumCtx.m, sumCtx.d) + ")\n" +
+      "• Salik: " + fmt(i.salik) + "\n• Hala Peak: " + fmt(i.hala) + "\n• Card Tip: " + fmt(i.tip) + "\n" +
+      "• Cash: " + fmt(i.cash) + "\n• Trips: " + i.trips + " × 2 = " + fmt(r.tripsFee) + "\n" +
+      "• Booking: " + fmt(i.book) + "\n• KM: " + i.km + " × " + i.fuel.toFixed(2) + " = " + fmt(r.fuelCost) + "\n" +
+      "• Careem: " + fmt(i.careem) + "\n• Careem Discount: " + fmt(discountVal) + "\n" +
+      "*Total Deductions:* " + fmt(r.ded) + "\n" +
+      "*Gross Income:* " + fmt(r.gross) + "\n" +
+      "✅ *Clean Income (Target):* " + fmt(r.net) + " AED";
+    try { await navigator.clipboard.writeText(text); toast("Copied WhatsApp summary"); }
+    catch (e) { toast("Copy not available", "error"); }
+  });
+
+  document.querySelectorAll("#calc input[data-calc]").forEach(function (el) {
+    el.addEventListener("input", function() { refreshCalcOutput(); applyCalc(); });
+  });
+
+  $("cFuel").addEventListener("input", function () {
+    var v = parseFloat(this.value);
+    if (isFinite(v) && v >= 0) {
+      try { localStorage.setItem(FUEL_KEY, String(v)); } catch (e) {}
+    }
+    refreshCalcOutput();
+    applyCalc();
+  });
+
+  /* HELP & REPORT */
   function openHelp() {
     opener = document.activeElement;
     var list = $("helpList");
@@ -709,39 +1213,48 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     for (var d = 1; d <= days; d++) {
       var v = getVal(d);
       var txt = v === "off" ? "Off" : (v > 0 ? fmt(v) : "—");
-      rows += "<tr>" +
-        "<td>" + d + " " + weekday(d) + "</td>" +
-        '<td class="num' + (v === "off" || !(v > 0) ? " dim" : "") + '">' + txt + "</td>" +
-      "</tr>";
+      rows += "<tr><td>" + d + " " + weekday(d) + "</td>" + '<td class="num' + (v === "off" || !(v > 0) ? " dim" : "") + '">' + txt + "</td></tr>";
     }
-    var html = '' +
-      '<div class="paper-head">' +
-        '<h3>' + esc(COMPANY) + ' — Monthly Report</h3>' +
-        '<p>' + esc(monthName()) + ' · Driver ID ' + esc(driverId()) + '</p>' +
-      '</div>' +
-      '<div class="paper-body">' +
-        '<dl class="meta">' +
-          '<div><dt>Driver ID</dt><dd>' + esc(driverId()) + '</dd></div>' +
-          '<div><dt>Month</dt><dd>' + esc(monthName()) + '</dd></div>' +
-        '</dl>' +
-        '<dl class="sum">' +
-          '<div><dt>Total income</dt><dd>' + aed(s.total) + '</dd></div>' +
-          '<div><dt>Monthly target</dt><dd>' + aed(s.target) + '</dd></div>' +
-          '<div><dt>Target left</dt><dd>' + aed(s.left) + '</dd></div>' +
-          '<div><dt>Target %</dt><dd>' + (s.worked ? s.pct + "%" : "—") + '</dd></div>' +
-          '<div><dt>Worked days</dt><dd>' + s.worked + '</dd></div>' +
-          '<div><dt>Off days</dt><dd>' + s.off + '</dd></div>' +
-          '<div><dt>Daily average</dt><dd>' + (s.worked ? aed(s.avg) : "—") + '</dd></div>' +
-          '<div><dt>Lowest / Highest</dt><dd>' + (s.worked ? aed(s.min) + " / " + aed(s.max) : "—") + '</dd></div>' +
-        '</dl>' +
-        '<div class="tbl-wrap"><table>' +
-          '<thead><tr><th>Day</th><th class="num">Income (AED)</th></tr></thead>' +
-          '<tbody>' + rows + '</tbody>' +
-          '<tfoot><tr><td>Total</td><td class="num">' + fmt(s.total) + '</td></tr></tfoot>' +
-        '</table></div>' +
-        '<p class="gen">Generated ' + new Date().toLocaleString("en-US") + ' · Arabia Taxi Tracker</p>' +
-      '</div>';
+    var html = '<div class="paper-head">' +
+      '<div><h3>' + esc(COMPANY) + ' — Monthly Report</h3></div>' +
+      '<p>' + esc(monthName()) + ' · ID ' + esc(driverId()) + '</p>' +
+    '</div>' +
+    '<div class="paper-body">' +
+      '<dl class="meta"><div><dt>Driver ID</dt><dd>' + esc(driverId()) + '</dd></div><div><dt>Month</dt><dd>' + esc(monthName()) + '</dd></div></dl>' +
+      '<dl class="sum">' +
+        '<div><dt>Total income</dt><dd>' + aed(s.total) + '</dd></div>' +
+        '<div><dt>Monthly target</dt><dd>' + aed(s.target) + '</dd></div>' +
+        '<div><dt>Target left</dt><dd>' + aed(s.left) + '</dd></div>' +
+        '<div><dt>Target %</dt><dd>' + (s.worked ? s.pct + "%" : "—") + '</dd></div>' +
+        '<div><dt>Worked days</dt><dd>' + s.worked + '</dd></div>' +
+        '<div><dt>Off days</dt><dd>' + s.off + '</dd></div>' +
+        '<div><dt>Daily average</dt><dd>' + (s.worked ? aed(s.avg) : "—") + '</dd></div>' +
+        '<div><dt>Low / Top day</dt><dd>' + (s.worked ? fmt(s.min) + " / " + fmt(s.max) : "—") + '</dd></div>' +
+      '</dl>' +
+      '<div class="tbl-wrap"><table><thead><tr><th>Day</th><th class="num">Income (AED)</th></tr></thead><tbody>' + rows + '</tbody><tfoot><tr><td>Total</td><td class="num">' + fmt(s.total) + '</td></tr></tfoot></table></div>' +
+      '<p class="gen">Generated ' + new Date().toLocaleString("en-US") + ' · Arabia Taxi Tracker</p>' +
+    '</div>';
     $("paper").innerHTML = html;
+  }
+
+  function applySinglePageFit(el) {
+    el.style.transform = "";
+    el.style.transformOrigin = "";
+    el.style.width = "";
+    var targetHeightPx = 1040;
+    var currentHeight = el.scrollHeight;
+    if (currentHeight > targetHeightPx) {
+      var ratio = targetHeightPx / currentHeight;
+      el.style.transform = "scale(" + ratio.toFixed(4) + ")";
+      el.style.transformOrigin = "top left";
+      el.style.width = (100 / ratio).toFixed(2) + "%";
+    }
+  }
+
+  function clearSinglePageFit(el) {
+    el.style.transform = "";
+    el.style.transformOrigin = "";
+    el.style.width = "";
   }
 
   function openReport() {
@@ -749,14 +1262,12 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
     $("reportMsg").textContent = "";
     buildReport();
     $("report").hidden = false;
-    $("report").dataset.opened = "1";
     document.body.classList.add("overlay-open");
     $("reportClose").focus();
   }
 
   function closeReport() {
     $("report").hidden = true;
-    $("report").dataset.opened = "";
     document.body.classList.remove("overlay-open");
     if (opener && opener.focus) opener.focus();
   }
@@ -764,107 +1275,58 @@ button:focus-visible, a:focus-visible, .idbox:focus-within, .field:focus-within 
   $("exportBtn").addEventListener("click", openReport);
   $("reportClose").addEventListener("click", closeReport);
 
-  function getPdfFilename() {
-    var m = monthName().replace(/\s+/g, "_");
-    var id = driverId().replace(/[^a-zA-Z0-9_-]/g, "") || DEFAULT_DRIVER_ID;
-    return "Arabia_Taxi_Report_" + m + "_" + id + ".pdf";
-  }
-
   function triggerSystemPrint() {
     var reportEl = $("report");
+    var paperEl = $("paper");
     var wasHidden = reportEl.hasAttribute("hidden");
     if (wasHidden) reportEl.removeAttribute("hidden");
+    applySinglePageFit(paperEl);
     document.body.classList.remove("overlay-open");
-
-    var restore = function () {
-      if (wasHidden) reportEl.setAttribute("hidden", "");
-      document.body.classList.add("overlay-open");
-    };
-    var fallback = setTimeout(restore, 8000);
-    var onAfter = function () {
-      clearTimeout(fallback);
-      restore();
-      window.removeEventListener("afterprint", onAfter);
-    };
-    window.addEventListener("afterprint", onAfter);
-
     setTimeout(function () {
-      try {
-        window.print();
-      } catch (err) {
-        $("reportMsg").textContent = "Print not supported on this device. Use Share instead.";
-      }
+      try { window.print(); } catch (err) { $("reportMsg").textContent = "Print not supported."; }
+      setTimeout(function () { clearSinglePageFit(paperEl); }, 400);
     }, 120);
   }
 
   $("downloadPdfBtn").addEventListener("click", async function () {
     var btn = $("downloadPdfBtn");
     var msgEl = $("reportMsg");
-    var filename = getPdfFilename();
-
+    var paperEl = $("paper");
     if (typeof window.html2pdf === "undefined") {
-      msgEl.textContent = "Opening system print dialog to save PDF...";
       triggerSystemPrint();
       return;
     }
-
     btn.disabled = true;
-    msgEl.textContent = "Generating PDF file, please wait...";
-
-    var paperEl = $("paper");
-    
+    msgEl.textContent = "Generating single-page PDF...";
+    applySinglePageFit(paperEl);
     try {
-      var opt = {
-        margin: [10, 10, 10, 10],
-        filename: filename,
+      await window.html2pdf().set({
+        margin: [4, 4, 4, 4],
+        filename: "Arabia_Taxi_Report_" + monthName().replace(/\s+/g, "_") + "_" + driverId() + ".pdf",
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#FFFFFF", scrollY: 0 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-      };
-
-      await window.html2pdf().set(opt).from(paperEl).save();
-      msgEl.textContent = "PDF downloaded: " + filename;
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all"] }
+      }).from(paperEl).save();
+      msgEl.textContent = "Single-page PDF downloaded successfully!";
       toast("PDF downloaded");
     } catch (err) {
-      msgEl.textContent = "Direct download blocked — opening Print / Save as PDF...";
       triggerSystemPrint();
     } finally {
+      clearSinglePageFit(paperEl);
       btn.disabled = false;
     }
   });
 
-  $("printBtn").addEventListener("click", function () {
-    $("reportMsg").textContent = "";
-    triggerSystemPrint();
-  });
-
+  $("printBtn").addEventListener("click", triggerSystemPrint);
   $("shareBtn").addEventListener("click", async function () {
     var s = computeStats();
-    var text = COMPANY + "\n" + monthName() + "\nDriver ID: " + driverId() +
-      "\nTotal: " + aed(s.total) +
-      "\nWorked: " + s.worked + " days · Off: " + s.off + " days" +
-      "\nTarget: " + aed(s.target) + " · Left: " + aed(s.left);
-
+    var text = COMPANY + "\n" + monthName() + "\nDriver ID: " + driverId() + "\nTotal: " + aed(s.total) + "\nWorked: " + s.worked + " days · Off: " + s.off + " days";
     if (navigator.share) {
-      try {
-        await navigator.share({ title: "Arabia Taxi Monthly Report", text: text });
-        return;
-      } catch (e) { /* cancelled */ }
+      try { await navigator.share({ title: "Report", text: text }); return; } catch (e) {}
     }
-    try {
-      await navigator.clipboard.writeText(text);
-      $("reportMsg").textContent = "Report copied to clipboard.";
-      toast("Copied to clipboard");
-    } catch (e) {
-      $("reportMsg").textContent = "Sharing not available on this device.";
-    }
-  });
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      if (!$("help").hidden) closeHelp();
-      else if (!$("report").hidden) closeReport();
-    }
+    await navigator.clipboard.writeText(text);
+    toast("Copied to clipboard");
   });
 
   syncThemeUI();
